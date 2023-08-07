@@ -10,6 +10,7 @@
 #include <PGE/utils.hpp>
 #include <PGE/callbacks.hpp>
 #include <PGE/components.hpp>
+#include <PGE/shader.hpp>
 
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
@@ -26,7 +27,7 @@ const char *fragmentShaderSource = "#version 330 core\n"
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\0";
 
-GLuint shaderProgram;
+PGE::Shader shaderProgram;
 flecs::entity tri;
 float triangleVertices[] = 
 {
@@ -74,24 +75,7 @@ namespace PGE
         //Set up callbacks
         glfwSetFramebufferSizeCallback(window, PGE::resizeCB);
 
-        //Create shaders
-        GLuint vertexShader;
-        vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-        glCompileShader(vertexShader);
-        
-        GLuint fragmentShader;
-        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-        glCompileShader(fragmentShader);
-
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
-
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+        shaderProgram = Shader("shaders/vertex.vert", "shaders/fragment.frag");
         
         return 0;
     }
@@ -130,7 +114,7 @@ namespace PGE
             glClear(GL_COLOR_BUFFER_BIT);
 
             const Mesh* tempMesh = tri.get<Mesh>();
-            glUseProgram(shaderProgram);
+            glUseProgram(shaderProgram.getProgram());
             glBindVertexArray(tempMesh->VAO);
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
