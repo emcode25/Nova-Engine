@@ -2,33 +2,20 @@
 #include <GLFW/glfw3.h>
 
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <flecs.h>
 
 #include <iostream>
+#include <cmath>
 
 #include <PGE/const.hpp>
 #include <PGE/utils.hpp>
 #include <PGE/callbacks.hpp>
 #include <PGE/components.hpp>
+#include <PGE/objects.hpp>
 #include <PGE/shader.hpp>
 
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-    
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\0";
-
-PGE::Shader shaderProgram;
-flecs::entity tri;
+flecs::entity cube;
 float triangleVertices[] = 
 {
     -0.5f, -0.5f, 0.0f,
@@ -38,6 +25,7 @@ float triangleVertices[] =
 
 namespace PGE
 {
+    Shader defaultShader;
     flecs::world ecs;
     GLFWwindow* window;
 
@@ -74,30 +62,77 @@ namespace PGE
 
         //Set up callbacks
         glfwSetFramebufferSizeCallback(window, PGE::resizeCB);
+        
+        //Allow OpenGL settings
+        glEnable(GL_DEPTH_TEST);
 
-        shaderProgram = Shader("shaders/vertex.vert", "shaders/fragment.frag");
+        //Create shader
+        defaultShader.init("../../../shaders/vertex.vert", "../../../shaders/fragment.frag");
         
         return 0;
     }
 
     int initECS()
     {
-        tri = PGE::ecs.entity(); //Creates a new entity
+        //Render system includes transformation information
+        auto renderSystem = PGE::ecs.system<const Transform, const Mesh>("Render")
+            .each([](flecs::entity e, const Transform& t, const Mesh& mesh)
+            {
+                //Modify transform properties (locally)
+                PGE::Transform transform = t;
+                transform.rotation = Eigen::Vector3f(0.0f, static_cast<float>(glfwGetTime()), 0.0f);
+
+                //Perform world space transformations
+                Eigen::Affine3f model = Eigen::Affine3f::Identity();
+                model.translate(transform.position);
+                model.rotate(PGE::rotateFromEuler(transform.rotation, true));
+                model.scale(transform.scale);
+
+                //Transform to view space
+                Eigen::Matrix4f view = PGE::lookAt({0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f});
+
+                //Project into clip space
+                Eigen::Matrix4f proj = PGE::makePerspective(
+                    static_cast<float>(PGE::CONST::SCREEN_WIDTH) / static_cast<float>(PGE::CONST::SCREEN_HEIGHT), 
+                    45.0f * PGE::CONST::DEG_TO_RAD, 0.1f, 100.0f); //Do not forget about integer division
+                
+                //Activate program and send matrices to shaders
+                GLuint program = defaultShader.getProgram();
+                glUseProgram(program);
+
+                GLuint modelLoc = glGetUniformLocation(program, "model");
+                GLuint viewLoc = glGetUniformLocation(program, "view");
+                GLuint projLoc = glGetUniformLocation(program, "proj");
+                
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.data());
+                glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data());
+                glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj.data());
+                
+
+                //Render the mesh
+                glBindVertexArray(mesh.VAO);
+                glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+            });
+
+        //tri = PGE::ecs.entity(); //Creates a new entity
     
         //Add a transform to the triangle.
-        tri.add<PGE::Transform>();
-        tri.set<PGE::Transform>({{1.0f, 2.0f, 3.0f}, {0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}});
+        //tri.add<PGE::Transform>();
+        //tri.set<PGE::Transform>({{1.0f, 2.0f, 3.0f}, {0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}});
 
-        GLuint tempVAO, tempVBO;
-        glGenBuffers(1, &tempVBO);
-        glGenVertexArrays(1, &tempVAO);
-        tri.set<PGE::Mesh>({triangleVertices, tempVAO, tempVBO});
+        //GLuint tempVAO, tempVBO;
+        //glGenBuffers(1, &tempVBO);
+        //glGenVertexArrays(1, &tempVAO);
+        //tri.set<PGE::Mesh>({triangleVertices, tempVAO, tempVBO});
 
-        glBindVertexArray(tempVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, tempVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
-        glEnableVertexAttribArray(0);
+        //glBindVertexArray(tempVAO);
+        //glBindBuffer(GL_ARRAY_BUFFER, tempVBO);
+        //glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
+        //glEnableVertexAttribArray(0);
+
+        cube = PGE::createCube(ecs);
+        cube.set_name("cube1");
 
         return 0;
     }
@@ -111,12 +146,14 @@ namespace PGE
 
             //All logic here
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            const Mesh* tempMesh = tri.get<Mesh>();
-            glUseProgram(shaderProgram.getProgram());
-            glBindVertexArray(tempMesh->VAO);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            //const Mesh* tempMesh = cube.get<Mesh>();
+            //glUseProgram(defaultShader.getProgram());
+            //glBindVertexArray(tempMesh->VAO);
+            //glDrawArrays(GL_TRIANGLES, 0, 36);
+
+            ecs.progress();
 
             //Swap buffers and get new inputs
             glfwSwapBuffers(window);
@@ -128,6 +165,7 @@ namespace PGE
 
     void quit()
     {
+        glfwDestroyWindow(PGE::window);
         glfwTerminate();
     }
 }
@@ -138,15 +176,14 @@ int main(void)
 
     PGE::initECS();
 
-    const PGE::Transform *t = tri.get<PGE::Transform>();
+    const auto *t = cube.get<PGE::Mesh>();
 
-    std::cout << "Pos: " << t->position.transpose() << std::endl;
-    std::cout << "Rot: " << t->rotation.transpose() << std::endl;
-    std::cout << "Sca: " << t->scale.transpose() << std::endl;
+    std::cout << "Pos: " << t->VAO << std::endl;
+    std::cout << "Rot: " << t->VBO << std::endl;
 
     PGE::mainLoop();
 
-    tri.destruct();
+    cube.destruct();
 
     PGE::quit();
 

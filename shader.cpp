@@ -4,23 +4,54 @@
 
 #include <PGE/utils.hpp>
 
-PGE::Shader::Shader(const char* vertexFilename, const char* fragmentFilename)
+void checkCompileErrors(unsigned int shader, std::string type)
 {
-	const char *vertexCode, *fragmentCode;
-    std::string temp = readFileToString(vertexFilename);
-    vertexCode = temp.c_str();
-    temp = readFileToString(fragmentFilename);
-    fragmentCode = temp.c_str();
+    int success;
+    char infoLog[1024];
+    if (type != "PROGRAM")
+    {
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+        }
+    }
+    else
+    {
+        glGetProgramiv(shader, GL_LINK_STATUS, &success);
+        if (!success)
+        {
+            glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+        }
+    }
+}
+
+PGE::Shader::Shader()
+{
+    program = (GLuint)-1; //Max uint possible
+}
+
+//Init is necessary because shader creation needs to be after OpenGL initializes,
+//so initialization must wait until after that occurs.
+int PGE::Shader::init(const char* vertexFilename, const char* fragmentFilename)
+{
+    std::string vertexCode = readFileToString(vertexFilename);
+    std::string fragmentCode = readFileToString(fragmentFilename);
+    const char* temp;
 
     //Create shaders
     GLuint vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexCode, NULL);
+    temp = vertexCode.c_str();
+    glShaderSource(vertexShader, 1, &temp, NULL);
     glCompileShader(vertexShader);
 
     GLuint fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentCode, NULL);
+    temp = fragmentCode.c_str();
+    glShaderSource(fragmentShader, 1, &temp, NULL);
     glCompileShader(fragmentShader);
 
     program = glCreateProgram();
@@ -30,6 +61,13 @@ PGE::Shader::Shader(const char* vertexFilename, const char* fragmentFilename)
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+
+    return 0;
+}
+
+PGE::Shader::~Shader()
+{
+    glDeleteProgram(program);
 }
 
 GLuint PGE::Shader::getProgram(void)

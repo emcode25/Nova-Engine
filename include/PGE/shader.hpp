@@ -10,7 +10,11 @@ namespace PGE
 	class Shader
 	{
 	public:
-		Shader(const char* vertexFilename, const char* fragmentFilename);
+		Shader();
+
+		int init(const char* vertexFilename, const char* fragmentFilename);
+
+		~Shader();
 
 		GLuint getProgram(void);
 

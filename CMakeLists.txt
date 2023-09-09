@@ -16,7 +16,7 @@ project (PGE VERSION 0.1)
 
 # Add source to this project's executable.
 #file(GLOB_RECURSE SRC_FILES *.cpp CONFIGURE_DEPENDS)
-add_executable(PGE main.cpp flecs.c glad.c shader.cpp utils.cpp callbacks.cpp)
+add_executable(PGE main.cpp flecs.c glad.c shader.cpp utils.cpp callbacks.cpp objects.cpp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
@@ -26,4 +26,5 @@ endif()
 target_include_directories(PGE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 find_library(GLFW3 glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-target_link_libraries(PGE PUBLIC ${GLFW3})
+set(LIBS ${GLFW3} opengl32)
+target_link_libraries(PGE PUBLIC ${LIBS})
