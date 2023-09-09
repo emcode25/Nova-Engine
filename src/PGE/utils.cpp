@@ -149,5 +149,5 @@ Eigen::Quaternionf PGE::rotateFromEuler(Eigen::Vector3f angles, bool isRadians)
 	rotation.z() = cosPitch * cosYaw * sinRoll - sinPitch * sinYaw * cosRoll;
 	rotation.w() = cosPitch * cosYaw * cosRoll + sinPitch * sinYaw * sinRoll;
 
-	return rotation;
+	return rotation.normalized();
 }
