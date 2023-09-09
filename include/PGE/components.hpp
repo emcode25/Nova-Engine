@@ -1,9 +1,13 @@
 #ifndef COMPONENTS_HPP
 #define COMPONENTS_HPP
 
-#include <Eigen/Core>
-#include <glad/glad.h>
 #include <vector>
+
+#include <glad/glad.h>
+
+#include <Eigen/Core>
+
+#include <PGE/structs.hpp>
 
 namespace PGE
 {
@@ -21,19 +25,6 @@ namespace PGE
         {1.0f, 1.0f, 1.0f}
     };
 
-    //Vertex is meant to be used to populate the Mesh component
-    struct Vertex
-    {
-        Eigen::Vector3f pos;
-        Eigen::Vector3f normal;
-        Eigen::Vector2f uv;
-    };
-
-    struct Texture
-    {
-
-    };
-
     struct Mesh
     {
         std::vector<Vertex>  vertices;
@@ -42,6 +33,13 @@ namespace PGE
         GLuint VAO;
         GLuint VBO;
         GLuint EBO;
+    };
+
+    struct Camera
+    {
+        float fov;
+        float zNear;
+        float zFar;
     };
 }
 

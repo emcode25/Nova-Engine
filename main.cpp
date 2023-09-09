@@ -1,3 +1,6 @@
+#include <iostream>
+#include <cmath>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -5,8 +8,8 @@
 #include <Eigen/Geometry>
 #include <flecs.h>
 
-#include <iostream>
-#include <cmath>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 #include <PGE/const.hpp>
 #include <PGE/utils.hpp>
@@ -16,18 +19,15 @@
 #include <PGE/shader.hpp>
 
 flecs::entity cube;
-float triangleVertices[] = 
-{
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-};
 
 namespace PGE
 {
-    Shader defaultShader;
     flecs::world ecs;
     GLFWwindow* window;
+
+    std::vector<PGE::Texture> globalTextures;
+    PGE::Shader defaultShader;
+    flecs::entity activeCamera;
 
     int initGraphics(void)
     {
@@ -78,6 +78,13 @@ namespace PGE
         auto renderSystem = PGE::ecs.system<const Transform, const Mesh>("Render")
             .each([](flecs::entity e, const Transform& t, const Mesh& mesh)
             {
+                //Camera only needs its info pulled once
+                static auto cam = activeCamera.get_ref<PGE::Camera>();
+                static auto camTransform = activeCamera.get_ref<PGE::Transform>();
+                static Eigen::Vector3f camTarget = 
+                    PGE::rotateFromEuler(camTransform->rotation).normalized().toRotationMatrix() * 
+                    Eigen::Vector3f(0.0f, 0.0f, -1.0f);
+                
                 //Modify transform properties (locally)
                 PGE::Transform transform = t;
 
@@ -88,33 +95,46 @@ namespace PGE
                 model.scale(transform.scale);
 
                 //Transform to view space
-                Eigen::Matrix4f view = PGE::lookAt({0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f});
+                Eigen::Matrix4f view = PGE::lookAt(camTransform->position, camTarget);
 
                 //Project into clip space
                 Eigen::Matrix4f proj = PGE::makePerspective(
                     static_cast<float>(PGE::CONST::SCREEN_WIDTH) / static_cast<float>(PGE::CONST::SCREEN_HEIGHT), 
-                    45.0f * PGE::CONST::DEG_TO_RAD, 0.1f, 100.0f); //Do not forget about integer division
+                    cam->fov * PGE::CONST::DEG_TO_RAD, cam->zNear, cam->zFar); //Do not forget about integer division
                 
                 //Activate program and send matrices to shaders
                 GLuint program = defaultShader.getProgram();
                 glUseProgram(program);
 
                 GLuint modelLoc = glGetUniformLocation(program, "model");
-                GLuint viewLoc = glGetUniformLocation(program, "view");
-                GLuint projLoc = glGetUniformLocation(program, "proj");
+                GLuint viewLoc  = glGetUniformLocation(program, "view");
+                GLuint projLoc  = glGetUniformLocation(program, "proj");
                 
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.data());
                 glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data());
                 glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj.data());
-                
 
                 //Render the mesh
                 glBindVertexArray(mesh.VAO);
                 glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
             });
 
+        //Set up the main camera as the active camera
+        flecs::entity cam = ecs.entity("Main Camera");
+        cam.add<PGE::Transform>();
+        cam.set<PGE::Transform>({{0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
+        cam.add<PGE::Camera>();
+        cam.set<PGE::Camera>({45.0f, 0.1f, 100.0f});
+        activeCamera = cam;
+
+        //Load and store the container texture
+        globalTextures.push_back(PGE::loadTexture("../../../data/textures/container.jpg", PGE::TexType::DIFFUSE));
+
+        //Create a test cube
         cube = PGE::createCube(ecs);
         cube.set_name("cube1");
+        auto cubeMesh = cube.get_ref<PGE::Mesh>();
+        cubeMesh->textures.push_back(globalTextures[0]);
 
         return 0;
     }
@@ -157,6 +177,8 @@ namespace PGE
 
 int main(void)
 {
+    stbi_set_flip_vertically_on_load(true);
+
     PGE::initGraphics();
 
     PGE::initECS();

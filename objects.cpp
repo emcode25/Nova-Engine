@@ -1,7 +1,9 @@
 #include <PGE/objects.hpp>
 
-#include <PGE/components.hpp>
 #include <glad/glad.h>
+
+#include <PGE/components.hpp>
+#include <PGE/utils.hpp>
 
 constexpr int NUM_CUBE_VERTICES = 17;
 PGE::Vertex cubeVertices[] = 
@@ -57,7 +59,8 @@ flecs::entity PGE::createCube(const flecs::world& ecs)
 
     //Set mesh properties for use in GL commands
     mesh.vertices = std::vector<PGE::Vertex>(std::begin(cubeVertices), std::end(cubeVertices));
-    mesh.indices = std::vector<GLuint>(std::begin(cubeIndices), std::end(cubeIndices));
+    mesh.indices  = std::vector<GLuint>(std::begin(cubeIndices), std::end(cubeIndices));
+    mesh.textures = std::vector<PGE::Texture>();
     mesh.VAO = VAO;
     mesh.VBO = VBO;
     mesh.EBO = EBO;

@@ -3,8 +3,6 @@
 
 #include <glad/glad.h>
 
-#include <string>
-
 namespace PGE
 {
 	class Shader

@@ -1,8 +1,11 @@
+#include <glad/glad.h>
 #include <PGE/utils.hpp>
 
 #include <string>
 #include <iostream>
 #include <stdio.h>
+
+#include <stb_image.h>
 
 #include <PGE/const.hpp>
 
@@ -35,6 +38,59 @@ void PGE::processInput(GLFWwindow* window)
     {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
+}
+
+PGE::Texture PGE::loadTexture(const char* filename, PGE::TexType type)
+{
+	PGE::Texture tex{};
+
+	//Create the texture object
+	GLuint textureObj;
+	glGenTextures(1, &textureObj);
+	glBindTexture(GL_TEXTURE_2D, textureObj);
+
+	//TODO: Somehow allow user defined texture settings
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//Load textures
+	int width, height, channels;
+	GLubyte* data = stbi_load(filename, &width, &height, &channels, 0);
+	if (data)
+	{
+		//Choose the right format
+		GLint format;
+		switch (channels)
+		{
+			case 3:
+				format = GL_RGB;
+				break;
+			case 4:
+				format = GL_RGBA;
+				break;
+			default:
+				format = GL_RED;
+				break;
+		}
+
+		//Give OpenGL the texture
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		//Clean up and get the texture struct ready
+		stbi_image_free(data);
+
+		tex.texture = textureObj;
+		tex.type = type;
+	}
+	else
+	{
+		std::cerr << "ERROR: Failed to load texture: " << filename << std::endl;
+	}
+
+	return tex;
 }
 
 Eigen::Matrix4f PGE::lookAt(const Eigen::Vector3f& position, const Eigen::Vector3f& target, const Eigen::Vector3f& up)

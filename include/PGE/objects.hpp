@@ -1,5 +1,5 @@
-#ifndef OBJECTS_H
-#define OBJECTS_H
+#ifndef OBJECTS_HPP
+#define OBJECTS_HPP
 
 #include <flecs.h>
 
