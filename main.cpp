@@ -80,7 +80,6 @@ namespace PGE
             {
                 //Modify transform properties (locally)
                 PGE::Transform transform = t;
-                transform.rotation = Eigen::Vector3f(0.0f, static_cast<float>(glfwGetTime()), 0.0f);
 
                 //Perform world space transformations
                 Eigen::Affine3f model = Eigen::Affine3f::Identity();
@@ -114,23 +113,6 @@ namespace PGE
                 glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
             });
 
-        //tri = PGE::ecs.entity(); //Creates a new entity
-    
-        //Add a transform to the triangle.
-        //tri.add<PGE::Transform>();
-        //tri.set<PGE::Transform>({{1.0f, 2.0f, 3.0f}, {0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}});
-
-        //GLuint tempVAO, tempVBO;
-        //glGenBuffers(1, &tempVBO);
-        //glGenVertexArrays(1, &tempVAO);
-        //tri.set<PGE::Mesh>({triangleVertices, tempVAO, tempVBO});
-
-        //glBindVertexArray(tempVAO);
-        //glBindBuffer(GL_ARRAY_BUFFER, tempVBO);
-        //glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
-        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
-        //glEnableVertexAttribArray(0);
-
         cube = PGE::createCube(ecs);
         cube.set_name("cube1");
 
@@ -141,18 +123,21 @@ namespace PGE
     {
         while(!glfwWindowShouldClose(window))
         {
+            //Clean the slate
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             //Process new inputs
             processInput(PGE::window);
 
             //All logic here
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            const Transform* oldTransform = cube.get<PGE::Transform>();
+            Transform transform = *oldTransform;
+            transform.rotation = Eigen::Vector3f(0.0f, static_cast<float>(glfwGetTime()), 0.0f);
 
-            //const Mesh* tempMesh = cube.get<Mesh>();
-            //glUseProgram(defaultShader.getProgram());
-            //glBindVertexArray(tempMesh->VAO);
-            //glDrawArrays(GL_TRIANGLES, 0, 36);
-
+            cube.set<PGE::Transform>(transform);
+            
+            //Run the systems and pipelines
             ecs.progress();
 
             //Swap buffers and get new inputs
