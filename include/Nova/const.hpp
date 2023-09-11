@@ -1,7 +1,7 @@
 #ifndef CONST_HPP
 #define CONST_HPP
 
-namespace PGE
+namespace Nova
 {
     namespace CONST
     {
