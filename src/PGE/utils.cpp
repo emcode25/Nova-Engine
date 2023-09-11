@@ -1,5 +1,5 @@
 #include <glad/glad.h>
-#include <Nova/utils.hpp>
+#include <PGE/utils.hpp>
 
 #include <string>
 #include <iostream>
@@ -7,9 +7,9 @@
 
 #include <stb_image.h>
 
-#include <Nova/const.hpp>
+#include <PGE/const.hpp>
 
-std::string Nova::readFileToString(const char* filename)
+std::string PGE::readFileToString(const char* filename)
 {
 	FILE* file = fopen(filename, "r");
 	std::string contents;
@@ -32,7 +32,7 @@ std::string Nova::readFileToString(const char* filename)
 	return std::string("Could not read file.");
 }
 
-void Nova::processInput(GLFWwindow* window)
+void PGE::processInput(GLFWwindow* window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
@@ -40,9 +40,9 @@ void Nova::processInput(GLFWwindow* window)
     }
 }
 
-Nova::Texture Nova::loadTexture(const char* filename, Nova::TexType type)
+PGE::Texture PGE::loadTexture(const char* filename, PGE::TexType type)
 {
-	Nova::Texture tex{};
+	PGE::Texture tex{};
 
 	//Create the texture object
 	GLuint textureObj;
@@ -93,7 +93,7 @@ Nova::Texture Nova::loadTexture(const char* filename, Nova::TexType type)
 	return tex;
 }
 
-Eigen::Matrix4f Nova::lookAt(const Eigen::Vector3f& position, const Eigen::Vector3f& target, const Eigen::Vector3f& up)
+Eigen::Matrix4f PGE::lookAt(const Eigen::Vector3f& position, const Eigen::Vector3f& target, const Eigen::Vector3f& up)
 {
 	//Calculate orthogonal basis for camera and store in matrix
 	Eigen::Matrix4f lookAt;
@@ -114,7 +114,7 @@ Eigen::Matrix4f Nova::lookAt(const Eigen::Vector3f& position, const Eigen::Vecto
 	return lookAt;
 }
 
-Eigen::Matrix4f Nova::makePerspective(float aspectRatio, float fov, float near, float far)
+Eigen::Matrix4f PGE::makePerspective(float aspectRatio, float fov, float near, float far)
 {
 	//Create variables to save on repeated computations
 	float inverseCotFov = 1.0f / tanf(fov / 2.0f);
@@ -130,12 +130,12 @@ Eigen::Matrix4f Nova::makePerspective(float aspectRatio, float fov, float near, 
 }
 
 //x: pitch, y: yaw, z: roll, angles in degrees
-Eigen::Quaternionf Nova::rotateFromEuler(Eigen::Vector3f angles, bool isRadians)
+Eigen::Quaternionf PGE::rotateFromEuler(Eigen::Vector3f angles, bool isRadians)
 {
 	Eigen::Quaternionf rotation;
 
 	//Convert angles to radians
-	angles *= (isRadians) ? 1 : Nova::CONST::DEG_TO_RAD;
+	angles *= (isRadians) ? 1 : PGE::CONST::DEG_TO_RAD;
 
 	float cosPitch = cosf(angles.x() * 0.5f);
 	float sinPitch = sinf(angles.x() * 0.5f);

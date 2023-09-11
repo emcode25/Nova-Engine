@@ -17,12 +17,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <Nova/const.hpp>
-#include <Nova/utils.hpp>
-#include <Nova/callbacks.hpp>
-#include <Nova/components.hpp>
-#include <Nova/objects.hpp>
-#include <Nova/shader.hpp>
+#include <PGE/const.hpp>
+#include <PGE/utils.hpp>
+#include <PGE/callbacks.hpp>
+#include <PGE/components.hpp>
+#include <PGE/objects.hpp>
+#include <PGE/shader.hpp>
 
 std::vector<flecs::entity> cubes;
 
@@ -39,7 +39,7 @@ Eigen::Vector3f cubePositions[] = {
     {-1.3f,  1.0f, -1.5f}
 };
 
-namespace Nova
+namespace PGE
 {
     float deltaTime = 0.0f;
     float lastTime = 0.0f;
@@ -48,8 +48,8 @@ namespace Nova
     GLFWwindow* window;
 
     std::vector<flecs::entity> entities; //Global id list of all entities
-    std::vector<Nova::Texture> globalTextures;
-    Nova::Shader defaultShader;
+    std::vector<PGE::Texture> globalTextures;
+    PGE::Shader defaultShader;
     flecs::entity editorCamera;
 
     int initGraphics(void)
@@ -59,12 +59,12 @@ namespace Nova
         glfwInit();
 
         //Set hints
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Nova::CONST::OPENGL_VERSION_MAJOR);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Nova::CONST::OPENGL_VERSION_MINOR);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, PGE::CONST::OPENGL_VERSION_MAJOR);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, PGE::CONST::OPENGL_VERSION_MINOR);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         //Create and set window
-        window = glfwCreateWindow(Nova::CONST::SCREEN_WIDTH, Nova::CONST::SCREEN_HEIGHT, "Nova", NULL, NULL);
+        window = glfwCreateWindow(PGE::CONST::SCREEN_WIDTH, PGE::CONST::SCREEN_HEIGHT, "PGE", NULL, NULL);
         if(window == NULL)
         {
             std::cerr << "Failed to create a GLFW window." << std::endl;
@@ -74,7 +74,7 @@ namespace Nova
         glfwMakeContextCurrent(window);
 
         //Set up callbacks
-        glfwSetFramebufferSizeCallback(window, Nova::resizeCB);
+        glfwSetFramebufferSizeCallback(window, PGE::resizeCB);
 
 
         //---------------GLAD---------------//
@@ -89,7 +89,7 @@ namespace Nova
 
         //---------------OpenGL---------------//
         //Set the viewport
-        glViewport(0, 0, Nova::CONST::SCREEN_WIDTH, Nova::CONST::SCREEN_HEIGHT);
+        glViewport(0, 0, PGE::CONST::SCREEN_WIDTH, PGE::CONST::SCREEN_HEIGHT);
         
         //Allow OpenGL settings
         glEnable(GL_DEPTH_TEST);
@@ -106,7 +106,7 @@ namespace Nova
         ImGui_ImplOpenGL3_Init();
 
 
-        //---------------Nova---------------//
+        //---------------PGE---------------//
         //Create shader
         defaultShader.init("../../../shaders/vertex.vert", "../../../shaders/fragment.frag");
 
@@ -118,12 +118,12 @@ namespace Nova
     int initECS()
     {
         //Render system includes transformation information
-        auto renderSystem = Nova::ecs.system<const Transform, const Mesh>("Render")
+        auto renderSystem = PGE::ecs.system<const Transform, const Mesh>("Render")
         .iter([](flecs::iter& it, const Transform* t, const Mesh* mesh)
         {
             //Due to potential active camera change, properties must be retrieved once per render system call
-            auto cam = editorCamera.get_ref<Nova::Camera>();
-            auto camTransform = editorCamera.get_ref<Nova::Transform>();
+            auto cam = editorCamera.get_ref<PGE::Camera>();
+            auto camTransform = editorCamera.get_ref<PGE::Transform>();
 
             //Window size must be accounted for as well due to resize
             int windowWidth = 0, windowHeight = 0;
@@ -132,27 +132,27 @@ namespace Nova
             //This rotation calculation is needed once per render system call 
             //Translation MUST ALSO BE APPLIED to work properly
             //TODO: Fix roll rotation on camera
-            Eigen::Vector3f camTarget = Nova::rotateFromEuler(camTransform->rotation) *
+            Eigen::Vector3f camTarget = PGE::rotateFromEuler(camTransform->rotation) *
                 Eigen::Vector3f(0.0f, 0.0f, -1.0f) + camTransform->position;
 
             for (auto i : it)
             {
                 //Modify transform properties (locally)
-                Nova::Transform transform = t[i];
+                PGE::Transform transform = t[i];
 
                 //Perform world space transformations
                 Eigen::Affine3f model = Eigen::Affine3f::Identity();
                 model.translate(transform.position);
-                model.rotate(Nova::rotateFromEuler(transform.rotation));
+                model.rotate(PGE::rotateFromEuler(transform.rotation));
                 model.scale(transform.scale);
 
                 //Transform to view space
-                Eigen::Matrix4f view = Nova::lookAt(camTransform->position, camTarget);
+                Eigen::Matrix4f view = PGE::lookAt(camTransform->position, camTarget);
 
                 //Project into clip space
-                Eigen::Matrix4f proj = Nova::makePerspective(
+                Eigen::Matrix4f proj = PGE::makePerspective(
                     static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
-                    cam->fov * Nova::CONST::DEG_TO_RAD, cam->zNear, cam->zFar); //Do not forget about integer division
+                    cam->fov * PGE::CONST::DEG_TO_RAD, cam->zNear, cam->zFar); //Do not forget about integer division
 
                 //Activate program and send matrices to shaders
                 GLuint program = defaultShader.getProgram();
@@ -174,14 +174,14 @@ namespace Nova
 
         //Set up the main camera as the active camera
         flecs::entity cam = ecs.entity("Editor Camera");
-        cam.add<Nova::Transform>();
-        cam.set<Nova::Transform>({{0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
-        cam.add<Nova::Camera>();
-        cam.set<Nova::Camera>({45.0f, 0.1f, 100.0f});
+        cam.add<PGE::Transform>();
+        cam.set<PGE::Transform>({{0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
+        cam.add<PGE::Camera>();
+        cam.set<PGE::Camera>({45.0f, 0.1f, 100.0f});
         editorCamera = cam;
 
         //Load and store the container texture
-        globalTextures.push_back(Nova::loadTexture("../../../data/textures/container.jpg", Nova::TexType::DIFFUSE));
+        globalTextures.push_back(PGE::loadTexture("../../../data/textures/container.jpg", PGE::TexType::DIFFUSE));
 
         //Create test cubes
         cubes.resize(10);
@@ -194,12 +194,12 @@ namespace Nova
             transform.scale = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
 
             std::string name = "Cube " + std::to_string(i);
-            cubes[i] = Nova::createCube(ecs);
+            cubes[i] = PGE::createCube(ecs);
             cubes[i].set_doc_name(name.c_str());
             
-            auto cubeTransform = cubes[i].set<Nova::Transform>(transform);
+            auto cubeTransform = cubes[i].set<PGE::Transform>(transform);
 
-            auto cubeMesh = cubes[i].get_ref<Nova::Mesh>();
+            auto cubeMesh = cubes[i].get_ref<PGE::Mesh>();
             cubeMesh->textures.push_back(globalTextures[0]);
 
             entities.push_back(cubes[i]);
@@ -217,15 +217,15 @@ namespace Nova
 
             //Calculate delta-times
             float thisFrame = static_cast<float>(glfwGetTime());
-            Nova::deltaTime = thisFrame - Nova::lastTime;
-            Nova::lastTime  = thisFrame;
+            PGE::deltaTime  = thisFrame - PGE::lastTime;
+            PGE::lastTime   = thisFrame;
 
             //Get the inputs and process them
             glfwPollEvents();
-            processInput(Nova::window);
+            processInput(PGE::window);
 
             //Grab necessary references
-            auto camProps = editorCamera.get_ref<Nova::Camera>();
+            auto camProps = editorCamera.get_ref<PGE::Camera>();
 
             //Let ImGUI work
             ImGui_ImplOpenGL3_NewFrame();
@@ -243,7 +243,7 @@ namespace Nova
                 ImGui::End();
             }
 
-            auto activeTransform = activeObj.get_ref<Nova::Transform>();
+            auto activeTransform = activeObj.get_ref<PGE::Transform>();
             {
                 ImGui::Begin("Object Transform");
 
@@ -293,14 +293,14 @@ namespace Nova
             //All logic here
 
             //Run the systems and pipelines
-            ecs.progress(Nova::deltaTime);
+            ecs.progress(PGE::deltaTime);
 
             //Swap buffers
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             glfwSwapBuffers(window);
 
             //Framerate lock at 60fps, TESTING ONLY
-            float remaining = static_cast<float>(glfwGetTime()) - Nova::deltaTime;
+            float remaining = static_cast<float>(glfwGetTime()) - PGE::deltaTime;
             if (remaining < (1.0f / 60.0f))
             {
                 std::this_thread::sleep_for(
@@ -318,26 +318,26 @@ namespace Nova
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
 
-        glfwDestroyWindow(Nova::window);
+        glfwDestroyWindow(PGE::window);
         glfwTerminate();
     }
 }
 
 int main(void)
 {
-    Nova::initGraphics();
+    PGE::initGraphics();
 
-    Nova::initECS();
+    PGE::initECS();
 
-    Nova::mainLoop();
+    PGE::mainLoop();
 
     for (auto cube : cubes)
     {
         cube.destruct();
     }
-    Nova::editorCamera.destruct();
+    PGE::editorCamera.destruct();
 
-    Nova::quit();
+    PGE::quit();
 
     return 0;
 }

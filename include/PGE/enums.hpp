@@ -1,7 +1,7 @@
 #ifndef ENUMS_HPP
 #define ENUMS_HPP
 
-namespace Nova
+namespace PGE
 {
 	enum TexType
 	{

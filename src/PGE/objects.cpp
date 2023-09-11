@@ -1,12 +1,12 @@
-#include <Nova/objects.hpp>
+#include <PGE/objects.hpp>
 
 #include <glad/glad.h>
 
-#include <Nova/components.hpp>
-#include <Nova/utils.hpp>
+#include <PGE/components.hpp>
+#include <PGE/utils.hpp>
 
 constexpr int NUM_CUBE_VERTICES = 17;
-Nova::Vertex cubeVertices[] = 
+PGE::Vertex cubeVertices[] = 
 {   //Position              Normals       UVs
     {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, //0
     {{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f}}, //1
@@ -42,25 +42,25 @@ GLuint cubeIndices[] =
     11, 15, 3
 };
 
-flecs::entity Nova::createCube(const flecs::world& ecs)
+flecs::entity PGE::createCube(const flecs::world& ecs)
 {
     //Create cube and add basic Transform
 	flecs::entity cube = ecs.entity();
-	cube.add<Nova::Transform>();
-	cube.set<Nova::Transform>(Nova::DEFAULT_TRANSFORM);
+	cube.add<PGE::Transform>();
+	cube.set<PGE::Transform>(PGE::DEFAULT_TRANSFORM);
 
     //Load and set mesh for cube
     GLuint VAO, VBO, EBO;
 
-    Nova::Mesh mesh;
+    PGE::Mesh mesh;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
     //Set mesh properties for use in GL commands
-    mesh.vertices = std::vector<Nova::Vertex>(std::begin(cubeVertices), std::end(cubeVertices));
+    mesh.vertices = std::vector<PGE::Vertex>(std::begin(cubeVertices), std::end(cubeVertices));
     mesh.indices  = std::vector<GLuint>(std::begin(cubeIndices), std::end(cubeIndices));
-    mesh.textures = std::vector<Nova::Texture>();
+    mesh.textures = std::vector<PGE::Texture>();
     mesh.VAO = VAO;
     mesh.VBO = VBO;
     mesh.EBO = EBO;
@@ -71,25 +71,25 @@ flecs::entity Nova::createCube(const flecs::world& ecs)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
     //Set data in buffer
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Nova::Vertex) * mesh.vertices.size(), &mesh.vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(PGE::Vertex) * mesh.vertices.size(), &mesh.vertices[0], GL_STATIC_DRAW);
 
     //Position attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Nova::Vertex), (void*)offsetof(Nova::Vertex, pos));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PGE::Vertex), (void*)offsetof(PGE::Vertex, pos));
     glEnableVertexAttribArray(0);
 
     //Normal attributes
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Nova::Vertex), (void*)offsetof(Nova::Vertex, normal));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(PGE::Vertex), (void*)offsetof(PGE::Vertex, normal));
     glEnableVertexAttribArray(1);
 
     //UV attributes
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Nova::Vertex), (void*)offsetof(Nova::Vertex, uv));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(PGE::Vertex), (void*)offsetof(PGE::Vertex, uv));
     glEnableVertexAttribArray(2);
 
     //Set indices
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh.indices.size(), &mesh.indices[0], GL_STATIC_DRAW);
 
-	cube.add<Nova::Mesh>();
-    cube.set<Nova::Mesh>(mesh);
+	cube.add<PGE::Mesh>();
+    cube.set<PGE::Mesh>(mesh);
 
     return cube;
 }

@@ -3,7 +3,7 @@
 
 #include <glad/glad.h>
 
-namespace Nova
+namespace PGE
 {
 	class Shader
 	{

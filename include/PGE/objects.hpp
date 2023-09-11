@@ -3,7 +3,7 @@
 
 #include <flecs.h>
 
-namespace Nova
+namespace PGE
 {
 	flecs::entity createCube(const flecs::world& ecs);
 }

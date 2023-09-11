@@ -3,7 +3,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace Nova
+namespace PGE
 {
     void resizeCB(GLFWwindow* window, int width, int height);
 }
