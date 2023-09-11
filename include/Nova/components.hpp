@@ -7,9 +7,9 @@
 
 #include <Eigen/Core>
 
-#include <PGE/structs.hpp>
+#include <Nova/structs.hpp>
 
-namespace PGE
+namespace Nova
 {
     struct Transform
     {

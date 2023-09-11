@@ -1,9 +1,9 @@
 #ifndef STRUCTS_HPP
 #define STRUCTS_HPP
 
-#include <PGE/enums.hpp>
+#include <Nova/enums.hpp>
 
-namespace PGE
+namespace Nova
 {
     //Vertex is meant to be used to populate the Mesh component
     struct Vertex
@@ -16,7 +16,7 @@ namespace PGE
     struct Texture
     {
         unsigned int texture;
-        PGE::TexType type;
+        Nova::TexType type;
     };
 }
 

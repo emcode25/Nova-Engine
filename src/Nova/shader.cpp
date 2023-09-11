@@ -1,8 +1,8 @@
-#include <PGE/shader.hpp>
+#include <Nova/shader.hpp>
 
 #include <iostream>
 
-#include <PGE/utils.hpp>
+#include <Nova/utils.hpp>
 
 void checkCompileErrors(unsigned int shader, std::string type)
 {
@@ -28,14 +28,14 @@ void checkCompileErrors(unsigned int shader, std::string type)
     }
 }
 
-PGE::Shader::Shader()
+Nova::Shader::Shader()
 {
     program = (GLuint)-1; //Max uint possible
 }
 
 //Init is necessary because shader creation needs to be after OpenGL initializes,
 //so initialization must wait until after that occurs.
-int PGE::Shader::init(const char* vertexFilename, const char* fragmentFilename)
+int Nova::Shader::init(const char* vertexFilename, const char* fragmentFilename)
 {
     std::string vertexCode = readFileToString(vertexFilename);
     std::string fragmentCode = readFileToString(fragmentFilename);
@@ -65,12 +65,12 @@ int PGE::Shader::init(const char* vertexFilename, const char* fragmentFilename)
     return 0;
 }
 
-PGE::Shader::~Shader()
+Nova::Shader::~Shader()
 {
     glDeleteProgram(program);
 }
 
-GLuint PGE::Shader::getProgram(void)
+GLuint Nova::Shader::getProgram(void)
 {
 	return program;
 }
