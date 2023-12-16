@@ -64,7 +64,7 @@ namespace Nova
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         //Create and set window
-        window = glfwCreateWindow(Nova::CONST::SCREEN_WIDTH, Nova::CONST::SCREEN_HEIGHT, "Nova", NULL, NULL);
+        window = glfwCreateWindow(Nova::CONST::SCREEN_WIDTH, Nova::CONST::SCREEN_HEIGHT, "Nova Engine", NULL, NULL);
         if(window == NULL)
         {
             std::cerr << "Failed to create a GLFW window." << std::endl;
@@ -135,6 +135,14 @@ namespace Nova
             Eigen::Vector3f camTarget = Nova::rotateFromEuler(camTransform->rotation) *
                 Eigen::Vector3f(0.0f, 0.0f, -1.0f) + camTransform->position;
 
+            //Transform to view space
+            Eigen::Matrix4f view = Nova::lookAt(camTransform->position, camTarget);
+
+            //Project into clip space
+            Eigen::Matrix4f proj = Nova::makePerspective(
+                static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
+                cam->fov * Nova::CONST::DEG_TO_RAD, cam->zNear, cam->zFar); //Do not forget about integer division
+
             for (auto i : it)
             {
                 //Modify transform properties (locally)
@@ -145,14 +153,6 @@ namespace Nova
                 model.translate(transform.position);
                 model.rotate(Nova::rotateFromEuler(transform.rotation));
                 model.scale(transform.scale);
-
-                //Transform to view space
-                Eigen::Matrix4f view = Nova::lookAt(camTransform->position, camTarget);
-
-                //Project into clip space
-                Eigen::Matrix4f proj = Nova::makePerspective(
-                    static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
-                    cam->fov * Nova::CONST::DEG_TO_RAD, cam->zNear, cam->zFar); //Do not forget about integer division
 
                 //Activate program and send matrices to shaders
                 GLuint program = defaultShader.getProgram();
@@ -232,7 +232,64 @@ namespace Nova
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
+            //TODO: MainMenu function
+            {
+                bool quit = false;
+
+                if (ImGui::BeginMainMenuBar())
+                {
+                    if (ImGui::BeginMenu("File"))
+                    {
+                        //TODO: Implement a save system
+                        ImGui::MenuItem("Save",  "Ctrl-S");
+                        ImGui::MenuItem("Save as...", "Ctrl-Shift-S");
+
+                        ImGui::Separator();
+                        ImGui::MenuItem("Quit", "Alt-F4", &quit);
+
+                        ImGui::EndMenu();
+                    }
+
+                    if (ImGui::BeginMenu("Edit"))
+                    {
+                        ImGui::EndMenu();
+                    }
+
+                    if (ImGui::BeginMenu("Object"))
+                    {
+                        if (ImGui::BeginMenu("New Object"))
+                        {
+                            bool newCube = false;
+                            ImGui::MenuItem("Cube", NULL, &newCube);
+
+                            if (newCube)
+                            {
+                                auto cube = Nova::createCube(Nova::ecs);
+                                cube.set_doc_name("Cube");
+                                
+                                auto cubeMesh = cube.get_ref<Nova::Mesh>();
+                                cubeMesh->textures.push_back(globalTextures[0]);
+
+                                entities.push_back(cube);
+                            }
+
+                            ImGui::EndMenu();
+                        }
+
+                        ImGui::EndMenu();
+                    }
+                    
+                    ImGui::EndMainMenuBar();
+                }
+                
+                if (quit)
+                {
+                    glfwSetWindowShouldClose(window, quit);
+                }
+            }
+
             //ImGui suggests that a separate code block is helpful
+            //TODO: Move this to a Camera property section in ShowObjectProperties
             {
                 ImGui::Begin("Camera Controls");
 
@@ -243,6 +300,7 @@ namespace Nova
                 ImGui::End();
             }
 
+            //TODO: ShowObjectProperties function
             auto activeTransform = activeObj.get_ref<Nova::Transform>();
             {
                 ImGui::Begin("Object Transform");
@@ -254,7 +312,8 @@ namespace Nova
                 ImGui::End();
             }
 
-            //ImGui::ShowDemoWindow();
+            ImGui::ShowDemoWindow();
+            //TODO: ShowObjectList function
             {
                 ImGui::Begin("Object List", NULL, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar);
                 
@@ -276,6 +335,17 @@ namespace Nova
                         {
                             ImGui::SetItemDefaultFocus();
                         }
+
+                        if (ImGui::BeginPopupContextItem())
+                        {
+                            
+                            ImGui::Text("Rename:");
+                            ImGui::InputText("##rename", name.c_str(), IM_ARRAYSIZE(name));
+                            if (ImGui::Button("Close"))
+                                ImGui::CloseCurrentPopup();
+                            ImGui::EndPopup();
+                        }
+                        //TODO: Allow renaming of objects
                     }
 
                     ImGui::EndListBox();
