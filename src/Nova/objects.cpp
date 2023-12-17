@@ -46,13 +46,13 @@ flecs::entity Nova::createCube(const flecs::world& ecs)
 {
     //Create cube and add basic Transform
 	flecs::entity cube = ecs.entity();
-	cube.add<Nova::Transform>();
-	cube.set<Nova::Transform>(Nova::DEFAULT_TRANSFORM);
+	cube.add<Nova::Component::Transform>();
+	cube.set<Nova::Component::Transform>(Nova::Component::DEFAULT_TRANSFORM);
 
     //Load and set mesh for cube
     GLuint VAO, VBO, EBO;
 
-    Nova::Mesh mesh;
+    Nova::Component::Mesh mesh;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -88,8 +88,19 @@ flecs::entity Nova::createCube(const flecs::world& ecs)
     //Set indices
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh.indices.size(), &mesh.indices[0], GL_STATIC_DRAW);
 
-	cube.add<Nova::Mesh>();
-    cube.set<Nova::Mesh>(mesh);
+	cube.add<Nova::Component::Mesh>();
+    cube.set<Nova::Component::Mesh>(mesh);
 
     return cube;
+}
+
+flecs::entity Nova::createCamera(const flecs::world& ecs)
+{
+    flecs::entity cam = ecs.entity();
+	cam.add<Nova::Component::Transform>();
+	cam.set<Nova::Component::Transform>(Nova::Component::DEFAULT_TRANSFORM);
+    cam.add<Nova::Component::Camera>();
+    cam.set<Nova::Component::Camera>(Nova::Component::DEFAULT_CAMERA);
+
+    return cam;
 }

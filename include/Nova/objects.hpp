@@ -6,6 +6,7 @@
 namespace Nova
 {
 	flecs::entity createCube(const flecs::world& ecs);
+	flecs::entity createCamera(const flecs::world& ecs);
 }
 
 #endif

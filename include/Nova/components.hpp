@@ -11,36 +11,41 @@
 
 namespace Nova
 {
-    struct Transform
+    namespace Component
     {
-        Eigen::Vector3f position;
-        Eigen::Vector3f rotation;
-        Eigen::Vector3f scale;
-    };
+        struct Transform
+        {
+            Eigen::Vector3f position;
+            Eigen::Vector3f rotation;
+            Eigen::Vector3f scale;
+        };
 
-    const Transform DEFAULT_TRANSFORM =
-    {
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-        {1.0f, 1.0f, 1.0f}
-    };
+        const Transform DEFAULT_TRANSFORM =
+        {
+            {0.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f},
+            {1.0f, 1.0f, 1.0f}
+        };
 
-    struct Mesh
-    {
-        std::vector<Vertex>  vertices;
-        std::vector<GLuint>  indices;
-        std::vector<Texture> textures;
-        GLuint VAO;
-        GLuint VBO;
-        GLuint EBO;
-    };
+        struct Mesh
+        {
+            std::vector<Vertex>  vertices;
+            std::vector<GLuint>  indices;
+            std::vector<Texture> textures;
+            GLuint VAO;
+            GLuint VBO;
+            GLuint EBO;
+        };
 
-    struct Camera
-    {
-        float fov;
-        float zNear;
-        float zFar;
-    };
+        struct Camera
+        {
+            float fov;
+            float zNear;
+            float zFar;
+        };
+
+        const Camera DEFAULT_CAMERA = {45.0f, 1.0f, 100.0f};
+    }
 }
 
 #endif

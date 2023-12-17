@@ -118,12 +118,11 @@ namespace Nova
     int initECS()
     {
         //Render system includes transformation information
-        auto renderSystem = Nova::ecs.system<const Transform, const Mesh>("Render")
-        .iter([](flecs::iter& it, const Transform* t, const Mesh* mesh)
+        auto renderSystem = Nova::ecs.system<const Nova::Component::Transform, const Nova::Component::Mesh>("Render")
+        .iter([](flecs::iter& it, const Nova::Component::Transform* t, const Nova::Component::Mesh* mesh)
         {
-            //Due to potential active camera change, properties must be retrieved once per render system call
-            auto cam = editorCamera.get_ref<Nova::Camera>();
-            auto camTransform = editorCamera.get_ref<Nova::Transform>();
+            static auto cam = editorCamera.get_ref<Nova::Component::Camera>();
+            static auto camTransform = editorCamera.get_ref<Nova::Component::Transform>();
 
             //Window size must be accounted for as well due to resize
             int windowWidth = 0, windowHeight = 0;
@@ -146,7 +145,7 @@ namespace Nova
             for (auto i : it)
             {
                 //Modify transform properties (locally)
-                Nova::Transform transform = t[i];
+                Nova::Component::Transform transform = t[i];
 
                 //Perform world space transformations
                 Eigen::Affine3f model = Eigen::Affine3f::Identity();
@@ -172,13 +171,12 @@ namespace Nova
             }
         });
 
-        //Set up the main camera as the active camera
-        flecs::entity cam = ecs.entity("Editor Camera");
-        cam.add<Nova::Transform>();
-        cam.set<Nova::Transform>({{0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
-        cam.add<Nova::Camera>();
-        cam.set<Nova::Camera>({45.0f, 0.1f, 100.0f});
-        editorCamera = cam;
+        //The editor camera is an inaccessible camera
+        editorCamera = ecs.entity("Editor Camera");
+        editorCamera.add<Nova::Component::Transform>();
+        editorCamera.set<Nova::Component::Transform>({{0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
+        editorCamera.add<Nova::Component::Camera>();
+        editorCamera.set<Nova::Component::Camera>({45.0f, 0.1f, 100.0f});
 
         //Load and store the container texture
         globalTextures.push_back(Nova::loadTexture("../data/textures/container.jpg", Nova::TexType::DIFFUSE));
@@ -187,7 +185,7 @@ namespace Nova
         cubes.resize(10);
         for (int i = 0; i < 10; ++i)
         {
-            Transform transform;
+            Nova::Component::Transform transform;
             transform.position = cubePositions[i];
             transform.rotation = Eigen::Vector3f(0.8629051f, 0.2558994f, 0.4338701f).normalized() * 20.0f * i; 
             //TODO: Rotation about an arbitrary axis is broken
@@ -197,9 +195,9 @@ namespace Nova
             cubes[i] = Nova::createCube(ecs);
             cubes[i].set_doc_name(name.c_str());
             
-            auto cubeTransform = cubes[i].set<Nova::Transform>(transform);
+            auto cubeTransform = cubes[i].set<Nova::Component::Transform>(transform);
 
-            auto cubeMesh = cubes[i].get_ref<Nova::Mesh>();
+            auto cubeMesh = cubes[i].get_ref<Nova::Component::Mesh>();
             cubeMesh->textures.push_back(globalTextures[0]);
 
             entities.push_back(cubes[i]);
@@ -223,9 +221,6 @@ namespace Nova
             //Get the inputs and process them
             glfwPollEvents();
             processInput(Nova::window);
-
-            //Grab necessary references
-            auto camProps = editorCamera.get_ref<Nova::Camera>();
 
             //Let ImGUI work
             ImGui_ImplOpenGL3_NewFrame();
@@ -259,18 +254,26 @@ namespace Nova
                     {
                         if (ImGui::BeginMenu("New Object"))
                         {
-                            bool newCube = false;
-                            ImGui::MenuItem("Cube", NULL, &newCube);
-
-                            if (newCube)
+                            if (ImGui::MenuItem("Cube"))
                             {
                                 auto cube = Nova::createCube(Nova::ecs);
                                 cube.set_doc_name("Cube");
                                 
-                                auto cubeMesh = cube.get_ref<Nova::Mesh>();
+                                auto cubeMesh = cube.get_ref<Nova::Component::Mesh>();
                                 cubeMesh->textures.push_back(globalTextures[0]);
 
                                 entities.push_back(cube);
+                            }
+
+                            if (ImGui::MenuItem("Camera"))
+                            {
+                                auto cam = Nova::createCamera(Nova::ecs);
+                                cam.set_doc_name("Camera");
+                                
+                                //TODO: Add a camera mesh
+                                //auto camMesh = cube.get_ref<Nova::Component::Mesh>();
+
+                                entities.push_back(cam);
                             }
 
                             ImGui::EndMenu();
@@ -289,25 +292,29 @@ namespace Nova
             }
 
             //ImGui suggests that a separate code block is helpful
-            //TODO: Move this to a Camera property section in ShowObjectProperties
-            {
-                ImGui::Begin("Camera Controls");
-
-                ImGui::SliderFloat("FOV", &(camProps->fov), 1.0f, 45.0f, "%.1f");
-                ImGui::DragFloat("Near", &(camProps->zNear), 0.1f, 0.0f, 0.0f, "%.1f");
-                ImGui::DragFloat("Far", &(camProps->zFar), 0.1f, 0.0f, 0.0f, "%.1f");
-
-                ImGui::End();
-            }
 
             //TODO: ShowObjectProperties function
-            auto activeTransform = activeObj.get_ref<Nova::Transform>();
+            auto activeTransform = activeObj.get_ref<Nova::Component::Transform>();
             {
                 ImGui::Begin("Object Transform");
 
                 ImGui::DragFloat3("Position", &(activeTransform->position(0)), 0.05f);
                 ImGui::DragFloat3("Rotation", &(activeTransform->rotation(0)), 1.0f);
                 ImGui::DragFloat3("Scale", &(activeTransform->scale(0)), 0.1f);
+
+                ImGui::End();
+            }
+
+            //Grab necessary references
+            if(activeObj.has<Nova::Component::Camera>())
+            {
+                auto camProps = activeObj.get_ref<Nova::Component::Camera>();
+
+                ImGui::Begin("Camera Controls");
+
+                ImGui::SliderFloat("FOV", &(camProps->fov), 1.0f, 45.0f, "%.1f");
+                ImGui::DragFloat("Near", &(camProps->zNear), 0.1f, 0.0f, 0.0f, "%.1f");
+                ImGui::DragFloat("Far", &(camProps->zFar), 0.1f, 0.0f, 0.0f, "%.1f");
 
                 ImGui::End();
             }
