@@ -410,3 +410,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 out/
+
+# Linux build directory
+build/
+.vscode/

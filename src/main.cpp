@@ -108,7 +108,7 @@ namespace Nova
 
         //---------------Nova---------------//
         //Create shader
-        defaultShader.init("../../../shaders/vertex.vert", "../../../shaders/fragment.frag");
+        defaultShader.init("../shaders/vertex.vert", "../shaders/fragment.frag");
 
         stbi_set_flip_vertically_on_load(true);
         
@@ -181,7 +181,7 @@ namespace Nova
         editorCamera = cam;
 
         //Load and store the container texture
-        globalTextures.push_back(Nova::loadTexture("../../../data/textures/container.jpg", Nova::TexType::DIFFUSE));
+        globalTextures.push_back(Nova::loadTexture("../data/textures/container.jpg", Nova::TexType::DIFFUSE));
 
         //Create test cubes
         cubes.resize(10);
@@ -328,24 +328,37 @@ namespace Nova
                         name += e.raw_id();
                         if (ImGui::Selectable(name.c_str(), selected))
                         {
+                            //TODO: Allow multiple objects to be selected at once
+                            //This allows the object to be manipulated (one at a time)
                             activeObj = e;
                         }
 
+                        //Highlight selected object in list
                         if (selected)
                         {
                             ImGui::SetItemDefaultFocus();
+
+                            //TODO: Highlight object in window
                         }
 
+                        //Rename Objects (right-click)
                         if (ImGui::BeginPopupContextItem())
                         {
-                            
+                            char rename[Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT];
                             ImGui::Text("Rename:");
-                            ImGui::InputText("##rename", name.c_str(), IM_ARRAYSIZE(name));
+                            ImGui::InputText("##rename", rename, IM_ARRAYSIZE(rename));
+
                             if (ImGui::Button("Close"))
+                            {
+                                //Check for a new name if the window is closed
+                                if(e.doc_name() != rename)
+                                {
+                                    e.set_doc_name(rename);
+                                }
                                 ImGui::CloseCurrentPopup();
+                            }
                             ImGui::EndPopup();
                         }
-                        //TODO: Allow renaming of objects
                     }
 
                     ImGui::EndListBox();
@@ -359,8 +372,6 @@ namespace Nova
             //Clean the slate
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            //All logic here
 
             //Run the systems and pipelines
             ecs.progress(Nova::deltaTime);

@@ -24,9 +24,55 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 endif()
 
-# TODO: Add tests and install targets if needed.
-target_include_directories(Nova PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/imgui)
 
-find_library(GLFW3 glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-set(LIBS ${GLFW3} opengl32)
+# Determine the correct library locations
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  message("Linux detected.")
+  set(LIB_GLOBAL_DIR )
+
+  find_library(LIB_GLFW3 glfw)
+  if(NOT LIB_GLFW3)
+    message(FATAL_ERROR "glfw3 not found.")
+  endif()
+
+  find_library(LIB_GL GL)
+  if(NOT LIB_GL)
+    message(FATAL_ERROR "GL not found.")
+  endif()
+
+  find_library(LIB_X11 X11)
+  if(NOT LIB_X11)
+    message(FATAL_ERROR "X11 not found.")
+  endif()
+
+  find_library(LIB_PTHREAD pthread)
+  if(NOT LIB_PTHREAD)
+    message(FATAL_ERROR "pthread not found.")
+  endif()
+
+  find_library(LIB_XRANDR Xrandr)
+  if(NOT LIB_XRANDR)
+    message(FATAL_ERROR "Xrandr not found.")
+  endif()
+
+  find_library(LIB_XI Xi)
+  if(NOT LIB_XI)
+    message(FATAL_ERROR "Xi not found.")
+  endif()
+
+  find_library(LIB_DL dl)
+  if(NOT LIB_DL)
+    message(FATAL_ERROR "dl not found.")
+  endif()
+
+  set(LIBS glfw GL X11 pthread Xrandr Xi dl)
+endif()
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  find_library(GLFW3 glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+  set(LIBS ${GLFW3} opengl32)
+endif()
+
+# Find directories and libraries
+target_include_directories(Nova PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/imgui)
 target_link_libraries(Nova PUBLIC ${LIBS})

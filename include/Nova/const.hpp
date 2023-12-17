@@ -12,6 +12,8 @@ namespace Nova
         constexpr int SCREEN_HEIGHT = 600;
 
         constexpr float DEG_TO_RAD = 3.1415927f / 180.0f;
+
+        constexpr int OBJECT_NAME_CHARACTER_LIMIT = 256;
     }
 }
 
