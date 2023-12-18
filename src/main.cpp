@@ -222,17 +222,12 @@ namespace Nova
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            //TODO: MainMenu function
-            {
-                
-            }
-
-            //ImGui suggests that a separate code block is helpful
-
             ImGui::ShowDemoWindow();
+
+            Nova::EditorUI::MainMenu(Nova::window, Nova::ecs, Nova::entities);
             
             Nova::EditorUI::ShowObjectProperties(activeObj);
-            Nova::EditorUI::ShowObjectList(entities, activeObj);
+            Nova::EditorUI::ShowObjectList(Nova::entities, activeObj);
 
             ImGui::Render();
 
@@ -274,7 +269,7 @@ namespace Nova
 int main(void)
 {
     Nova::initGraphics();
-
+    
     Nova::initECS();
 
     Nova::mainLoop();

@@ -64,7 +64,7 @@ flecs::entity Nova::createCube(const flecs::world& ecs)
     mesh.vertices = std::vector<Nova::Vertex>(std::begin(cubeVertices), std::end(cubeVertices));
     mesh.indices  = std::vector<GLuint>(std::begin(cubeIndices), std::end(cubeIndices));
     mesh.textures = std::vector<Nova::Texture>();
-    mesh.textures[0] = containerTexture;
+    mesh.textures.push_back(containerTexture);
     mesh.VAO = VAO;
     mesh.VBO = VBO;
     mesh.EBO = EBO;
