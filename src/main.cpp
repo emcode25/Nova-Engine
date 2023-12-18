@@ -23,6 +23,7 @@
 #include <Nova/components.hpp>
 #include <Nova/objects.hpp>
 #include <Nova/shader.hpp>
+#include <Nova/ui.hpp>
 
 std::vector<flecs::entity> cubes;
 
@@ -178,9 +179,6 @@ namespace Nova
         editorCamera.add<Nova::Component::Camera>();
         editorCamera.set<Nova::Component::Camera>({45.0f, 0.1f, 100.0f});
 
-        //Load and store the container texture
-        globalTextures.push_back(Nova::loadTexture("../data/textures/container.jpg", Nova::TexType::DIFFUSE));
-
         //Create test cubes
         cubes.resize(10);
         for (int i = 0; i < 10; ++i)
@@ -192,13 +190,10 @@ namespace Nova
             transform.scale = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
 
             std::string name = "Cube " + std::to_string(i);
-            cubes[i] = Nova::createCube(ecs);
+            cubes[i] = Nova::createCube(Nova::ecs);
             cubes[i].set_doc_name(name.c_str());
             
             auto cubeTransform = cubes[i].set<Nova::Component::Transform>(transform);
-
-            auto cubeMesh = cubes[i].get_ref<Nova::Component::Mesh>();
-            cubeMesh->textures.push_back(globalTextures[0]);
 
             entities.push_back(cubes[i]);
         }
@@ -229,150 +224,15 @@ namespace Nova
 
             //TODO: MainMenu function
             {
-                bool quit = false;
-
-                if (ImGui::BeginMainMenuBar())
-                {
-                    if (ImGui::BeginMenu("File"))
-                    {
-                        //TODO: Implement a save system
-                        ImGui::MenuItem("Save",  "Ctrl-S");
-                        ImGui::MenuItem("Save as...", "Ctrl-Shift-S");
-
-                        ImGui::Separator();
-                        ImGui::MenuItem("Quit", "Alt-F4", &quit);
-
-                        ImGui::EndMenu();
-                    }
-
-                    if (ImGui::BeginMenu("Edit"))
-                    {
-                        ImGui::EndMenu();
-                    }
-
-                    if (ImGui::BeginMenu("Object"))
-                    {
-                        if (ImGui::BeginMenu("New Object"))
-                        {
-                            if (ImGui::MenuItem("Cube"))
-                            {
-                                auto cube = Nova::createCube(Nova::ecs);
-                                cube.set_doc_name("Cube");
-                                
-                                auto cubeMesh = cube.get_ref<Nova::Component::Mesh>();
-                                cubeMesh->textures.push_back(globalTextures[0]);
-
-                                entities.push_back(cube);
-                            }
-
-                            if (ImGui::MenuItem("Camera"))
-                            {
-                                auto cam = Nova::createCamera(Nova::ecs);
-                                cam.set_doc_name("Camera");
-                                
-                                //TODO: Add a camera mesh
-                                //auto camMesh = cube.get_ref<Nova::Component::Mesh>();
-
-                                entities.push_back(cam);
-                            }
-
-                            ImGui::EndMenu();
-                        }
-
-                        ImGui::EndMenu();
-                    }
-                    
-                    ImGui::EndMainMenuBar();
-                }
                 
-                if (quit)
-                {
-                    glfwSetWindowShouldClose(window, quit);
-                }
             }
 
             //ImGui suggests that a separate code block is helpful
 
-            //TODO: ShowObjectProperties function
-            auto activeTransform = activeObj.get_ref<Nova::Component::Transform>();
-            {
-                ImGui::Begin("Object Transform");
-
-                ImGui::DragFloat3("Position", &(activeTransform->position(0)), 0.05f);
-                ImGui::DragFloat3("Rotation", &(activeTransform->rotation(0)), 1.0f);
-                ImGui::DragFloat3("Scale", &(activeTransform->scale(0)), 0.1f);
-
-                ImGui::End();
-            }
-
-            //Grab necessary references
-            if(activeObj.has<Nova::Component::Camera>())
-            {
-                auto camProps = activeObj.get_ref<Nova::Component::Camera>();
-
-                ImGui::Begin("Camera Controls");
-
-                ImGui::SliderFloat("FOV", &(camProps->fov), 1.0f, 45.0f, "%.1f");
-                ImGui::DragFloat("Near", &(camProps->zNear), 0.1f, 0.0f, 0.0f, "%.1f");
-                ImGui::DragFloat("Far", &(camProps->zFar), 0.1f, 0.0f, 0.0f, "%.1f");
-
-                ImGui::End();
-            }
-
             ImGui::ShowDemoWindow();
-            //TODO: ShowObjectList function
-            {
-                ImGui::Begin("Object List", NULL, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar);
-                
-                static std::string name;
-                if (ImGui::BeginListBox("Objects", ImGui::GetWindowContentRegionMax()))
-                {
-                    for (auto e : entities)
-                    {
-                        const bool selected = (activeObj == e);
-                        name = e.doc_name();
-                        name += "##";
-                        name += e.raw_id();
-                        if (ImGui::Selectable(name.c_str(), selected))
-                        {
-                            //TODO: Allow multiple objects to be selected at once
-                            //This allows the object to be manipulated (one at a time)
-                            activeObj = e;
-                        }
-
-                        //Highlight selected object in list
-                        if (selected)
-                        {
-                            ImGui::SetItemDefaultFocus();
-
-                            //TODO: Highlight object in window
-                        }
-
-                        //Rename Objects (right-click)
-                        if (ImGui::BeginPopupContextItem())
-                        {
-                            char rename[Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT];
-                            ImGui::Text("Rename:");
-                            ImGui::InputText("##rename", rename, IM_ARRAYSIZE(rename));
-
-                            if (ImGui::Button("Close"))
-                            {
-                                //Check for a new name if the window is closed
-                                if(e.doc_name() != rename)
-                                {
-                                    e.set_doc_name(rename);
-                                }
-                                ImGui::CloseCurrentPopup();
-                            }
-                            ImGui::EndPopup();
-                        }
-                    }
-
-                    ImGui::EndListBox();
-                }
-                
-                ImGui::End();
-            }
+            
+            Nova::EditorUI::ShowObjectProperties(activeObj);
+            Nova::EditorUI::ShowObjectList(entities, activeObj);
 
             ImGui::Render();
 
