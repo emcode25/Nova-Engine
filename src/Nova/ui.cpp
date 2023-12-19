@@ -20,7 +20,7 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
             ImGui::MenuItem("Save as...", "Ctrl-Shift-S");
 
             ImGui::Separator();
-            if (ImGui::MenuItem("Quit", "Alt-F4"))
+            if (ImGui::MenuItem("Quit", "Alt-F4", &quit))
             {
                 glfwSetWindowShouldClose(window, quit);
             }
@@ -68,30 +68,28 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
 
 void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)
 {
-    auto activeTransform = obj.get_ref<Nova::Component::Transform>();
+    if(ImGui::Begin("Object Components"))
     {
-        ImGui::Begin("Object Transform");
+        auto activeTransform = obj.get_ref<Nova::Component::Transform>();
+        
+        if(ImGui::CollapsingHeader("Transform"))
+        {
+            ImGui::DragFloat3("Position", &(activeTransform->position(0)), 0.05f);
+            ImGui::DragFloat3("Rotation", &(activeTransform->rotation(0)), 1.0f);
+            ImGui::DragFloat3("Scale", &(activeTransform->scale(0)), 0.1f);
+        }
 
-        ImGui::DragFloat3("Position", &(activeTransform->position(0)), 0.05f);
-        ImGui::DragFloat3("Rotation", &(activeTransform->rotation(0)), 1.0f);
-        ImGui::DragFloat3("Scale", &(activeTransform->scale(0)), 0.1f);
+        if(obj.has<Nova::Component::Camera>() && ImGui::CollapsingHeader("Camera"))
+        {
+            auto camProps = obj.get_ref<Nova::Component::Camera>();
 
-        ImGui::End();
+            ImGui::SliderFloat("FOV", &(camProps->fov), 1.0f, 45.0f, "%.1f");
+            ImGui::DragFloat("Near", &(camProps->zNear), 0.1f, 0.0f, 0.0f, "%.1f");
+            ImGui::DragFloat("Far", &(camProps->zFar), 0.1f, 0.0f, 0.0f, "%.1f");
+        }
     }
 
-    //Grab necessary references
-    if(obj.has<Nova::Component::Camera>())
-    {
-        auto camProps = obj.get_ref<Nova::Component::Camera>();
-
-        ImGui::Begin("Camera Controls");
-
-        ImGui::SliderFloat("FOV", &(camProps->fov), 1.0f, 45.0f, "%.1f");
-        ImGui::DragFloat("Near", &(camProps->zNear), 0.1f, 0.0f, 0.0f, "%.1f");
-        ImGui::DragFloat("Far", &(camProps->zFar), 0.1f, 0.0f, 0.0f, "%.1f");
-
-        ImGui::End();
-    }    
+    ImGui::End();
 }
 
 void Nova::EditorUI::ShowObjectList(std::vector<flecs::entity>& objs, flecs::entity& activeObj)
