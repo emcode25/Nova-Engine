@@ -11,6 +11,7 @@ namespace Nova
 		Shader();
 
 		int init(const char* vertexFilename, const char* fragmentFilename);
+		int init(const char* vertexFilename, const char* geometryFilename, const char* fragmentFilename);
 
 		~Shader();
 

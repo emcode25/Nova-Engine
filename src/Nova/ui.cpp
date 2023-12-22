@@ -49,9 +49,6 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
                 {
                     auto cam = Nova::createCamera(ecs);
                     cam.set_doc_name("Camera");
-                    
-                    //TODO: Add a camera mesh
-                    //auto camMesh = cube.get_ref<Nova::Component::Mesh>();
 
                     objs.push_back(cam);
                 }

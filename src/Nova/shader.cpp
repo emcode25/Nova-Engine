@@ -65,6 +65,45 @@ int Nova::Shader::init(const char* vertexFilename, const char* fragmentFilename)
     return 0;
 }
 
+int Nova::Shader::init(const char* vertexFilename, const char* geometryFilename, const char* fragmentFilename)
+{
+    std::string vertexCode = readFileToString(vertexFilename);
+    std::string geometryCode = readFileToString(geometryFilename);
+    std::string fragmentCode = readFileToString(fragmentFilename);
+    const char* temp;
+
+    //Create shaders
+    GLuint vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    temp = vertexCode.c_str();
+    glShaderSource(vertexShader, 1, &temp, NULL);
+    glCompileShader(vertexShader);
+
+    GLuint geometryShader;
+    geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+    temp = geometryCode.c_str();
+    glShaderSource(geometryShader, 1, &temp, NULL);
+    glCompileShader(geometryShader);
+
+    GLuint fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    temp = fragmentCode.c_str();
+    glShaderSource(fragmentShader, 1, &temp, NULL);
+    glCompileShader(fragmentShader);
+
+    program = glCreateProgram();
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, geometryShader);
+    glAttachShader(program, fragmentShader);
+    glLinkProgram(program);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(geometryShader);
+    glDeleteShader(fragmentShader);
+
+    return 0;
+}
+
 Nova::Shader::~Shader()
 {
     glDeleteProgram(program);

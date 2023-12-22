@@ -106,5 +106,7 @@ flecs::entity Nova::createCamera(const flecs::world& ecs)
     cam.add<Nova::Component::Camera>();
     cam.set<Nova::Component::Camera>(Nova::Component::DEFAULT_CAMERA);
 
+    //TODO: Add a camera mesh
+
     return cam;
 }

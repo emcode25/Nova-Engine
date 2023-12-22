@@ -51,7 +51,9 @@ namespace Nova
     std::vector<flecs::entity> entities; //Global id list of all entities
     std::vector<Nova::Texture> globalTextures;
     Nova::Shader defaultShader;
+    Nova::Shader activeObjShader;
     flecs::entity editorCamera;
+    flecs::entity activeObj;
 
     int initGraphics(void)
     {
@@ -95,6 +97,8 @@ namespace Nova
         //Allow OpenGL settings
         glEnable(GL_DEPTH_TEST);
 
+        //Increase lines thickness for highlighting objects
+        glLineWidth(3.3f);
 
         //---------------IMGUI---------------//
         IMGUI_CHECKVERSION();
@@ -110,6 +114,7 @@ namespace Nova
         //---------------Nova---------------//
         //Create shader
         defaultShader.init("../shaders/vertex.vert", "../shaders/fragment.frag");
+        activeObjShader.init("../shaders/active/vertex.vert", "../shaders/active/geometry.geom", "../shaders/active/fragment.frag");
 
         stbi_set_flip_vertically_on_load(true);
         
@@ -170,6 +175,33 @@ namespace Nova
                 glBindVertexArray(mesh[i].VAO);
                 glDrawElements(GL_TRIANGLES, mesh[i].indices.size(), GL_UNSIGNED_INT, 0);
             }
+
+            if(activeObj.has<Nova::Component::Mesh>())
+            {
+                //Get the active object and do the same transform stuff
+                auto activeTransform = activeObj.get_ref<Nova::Component::Transform>();
+                Eigen::Affine3f model = Eigen::Affine3f::Identity();
+                model.translate(activeTransform->position);
+                model.rotate(Nova::rotateFromEuler(activeTransform->rotation));
+                model.scale(activeTransform->scale);
+
+                //Send to active object shader
+                GLuint program = activeObjShader.getProgram();
+                glUseProgram(program);
+
+                GLuint modelLoc = glGetUniformLocation(program, "model");
+                GLuint viewLoc = glGetUniformLocation(program, "view");
+                GLuint projLoc = glGetUniformLocation(program, "proj");
+
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.data());
+                glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data());
+                glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj.data());
+
+                //Render
+                auto activeMesh = activeObj.get_ref<Nova::Component::Mesh>();
+                glBindVertexArray(activeMesh->VAO);
+                glDrawElements(GL_TRIANGLES, activeMesh->indices.size(), GL_UNSIGNED_INT, 0);
+            }
         });
 
         //The editor camera is an inaccessible camera
@@ -198,6 +230,12 @@ namespace Nova
             entities.push_back(cubes[i]);
         }
 
+        auto cam = Nova::createCamera(ecs);
+        cam.set_doc_name("Camera");
+        entities.push_back(cam);
+
+        activeObj = cam;
+
         return 0;
     }
 
@@ -205,9 +243,6 @@ namespace Nova
     {
         while(!glfwWindowShouldClose(window))
         {
-            //The active object to focus on
-            static flecs::entity activeObj = entities[0];
-
             //Calculate delta-times
             float thisFrame = static_cast<float>(glfwGetTime());
             Nova::deltaTime = thisFrame - Nova::lastTime;
