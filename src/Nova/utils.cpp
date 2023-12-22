@@ -32,12 +32,32 @@ std::string Nova::readFileToString(const char* filename)
 	return std::string("Could not read file.");
 }
 
-void Nova::processInput(GLFWwindow* window)
+void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, float dt)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
+
+	if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		cam.updatePosition(Nova::Editor::EditorCameraMovement::FORWARD, dt);
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		cam.updatePosition(Nova::Editor::EditorCameraMovement::LEFT, dt);
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		cam.updatePosition(Nova::Editor::EditorCameraMovement::BACKWARD, dt);
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		cam.updatePosition(Nova::Editor::EditorCameraMovement::RIGHT, dt);
+	}
 }
 
 Nova::Texture Nova::loadTexture(const char* filename, Nova::TexType type)

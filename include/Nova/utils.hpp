@@ -9,10 +9,11 @@
 
 #include <Nova/structs.hpp>
 #include <Nova/components.hpp>
+#include <Nova/editor_camera.hpp>
 
 namespace Nova
 {
-    void processInput(GLFWwindow* window);
+    void processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, float dt);
     std::string readFileToString(const char* filename);
 
     Nova::Texture loadTexture(const char* filename, Nova::TexType type);

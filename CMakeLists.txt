@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for Nova, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.12)
 
 # C++ Standard Stuff
 set(CMAKE_CXX_STANDARD 17)
@@ -17,8 +17,8 @@ endif()
 project (Nova VERSION 0.1)
 
 # Add source to this project's executable.
-#file(GLOB_RECURSE SRC_FILES *.cpp CONFIGURE_DEPENDS)
-add_executable(Nova "src/main.cpp" "src/flecs.c" "src/glad.c" "src/Nova/shader.cpp" "src/Nova/utils.cpp" "src/Nova/callbacks.cpp" "src/Nova/objects.cpp" "src/imgui/imgui.cpp" "src/imgui/imgui_impl_glfw.cpp" "src/imgui/imgui_impl_opengl3.cpp" "src/imgui/imgui_tables.cpp" "src/imgui/imgui_widgets.cpp" "src/imgui/imgui_draw.cpp" "src/imgui/imgui_demo.cpp" "src/Nova/ui.cpp")
+file(GLOB SRC_FILES CONFIGURE_DEPENDS "src/*/*.cpp" "src/*/*.c" "src/*.c" "src/*.cpp")
+add_executable(Nova ${SRC_FILES})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

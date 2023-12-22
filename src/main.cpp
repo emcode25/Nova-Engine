@@ -24,6 +24,7 @@
 #include <Nova/objects.hpp>
 #include <Nova/shader.hpp>
 #include <Nova/ui.hpp>
+#include <Nova/editor_camera.hpp>
 
 std::vector<flecs::entity> cubes;
 
@@ -52,7 +53,7 @@ namespace Nova
     std::vector<Nova::Texture> globalTextures;
     Nova::Shader defaultShader;
     Nova::Shader activeObjShader;
-    flecs::entity editorCamera;
+    Nova::Editor::EditorCamera editorCamera;
     flecs::entity activeObj;
 
     int initGraphics(void)
@@ -127,8 +128,7 @@ namespace Nova
         auto renderSystem = Nova::ecs.system<const Nova::Component::Transform, const Nova::Component::Mesh>("Render")
         .iter([](flecs::iter& it, const Nova::Component::Transform* t, const Nova::Component::Mesh* mesh)
         {
-            static auto cam = editorCamera.get_ref<Nova::Component::Camera>();
-            static auto camTransform = editorCamera.get_ref<Nova::Component::Transform>();
+            static auto cam = editorCamera.getCameraProperties();
 
             //Window size must be accounted for as well due to resize
             int windowWidth = 0, windowHeight = 0;
@@ -137,16 +137,13 @@ namespace Nova
             //This rotation calculation is needed once per render system call 
             //Translation MUST ALSO BE APPLIED to work properly
             //TODO: Fix roll rotation on camera
-            Eigen::Vector3f camTarget = Nova::rotateFromEuler(camTransform->rotation) *
-                Eigen::Vector3f(0.0f, 0.0f, -1.0f) + camTransform->position;
-
             //Transform to view space
-            Eigen::Matrix4f view = Nova::lookAt(camTransform->position, camTarget);
+            Eigen::Matrix4f view = editorCamera.viewMatrix();
 
             //Project into clip space
             Eigen::Matrix4f proj = Nova::makePerspective(
                 static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
-                cam->fov * Nova::CONST::DEG_TO_RAD, cam->zNear, cam->zFar); //Do not forget about integer division
+                cam.fov * Nova::CONST::DEG_TO_RAD, cam.zNear, cam.zFar); //Do not forget about integer division
 
             //Loop setup
             //Activate program and send matrices to shaders
@@ -206,13 +203,6 @@ namespace Nova
             }
         });
 
-        //The editor camera is an inaccessible camera
-        editorCamera = ecs.entity("Editor Camera");
-        editorCamera.add<Nova::Component::Transform>();
-        editorCamera.set<Nova::Component::Transform>({{0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}});
-        editorCamera.add<Nova::Component::Camera>();
-        editorCamera.set<Nova::Component::Camera>({45.0f, 0.1f, 100.0f});
-
         //Create test cubes
         cubes.resize(10);
         for (int i = 0; i < 10; ++i)
@@ -252,7 +242,7 @@ namespace Nova
 
             //Get the inputs and process them
             glfwPollEvents();
-            processInput(Nova::window);
+            processInput(Nova::window, Nova::editorCamera, Nova::deltaTime);
 
             //Let ImGUI work
             ImGui_ImplOpenGL3_NewFrame();
@@ -315,7 +305,6 @@ int main(void)
     {
         cube.destruct();
     }
-    Nova::editorCamera.destruct();
 
     Nova::quit();
 
