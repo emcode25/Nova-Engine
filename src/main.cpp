@@ -148,6 +148,18 @@ namespace Nova
                 static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
                 cam->fov * Nova::CONST::DEG_TO_RAD, cam->zNear, cam->zFar); //Do not forget about integer division
 
+            //Loop setup
+            //Activate program and send matrices to shaders
+            GLuint program = defaultShader.getProgram();
+            glUseProgram(program);
+
+            GLuint modelLoc = glGetUniformLocation(program, "model");
+            GLuint viewLoc = glGetUniformLocation(program, "view");
+            GLuint projLoc = glGetUniformLocation(program, "proj");
+
+            glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data());
+            glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj.data());
+
             for (auto i : it)
             {
                 //Modify transform properties (locally)
@@ -159,17 +171,7 @@ namespace Nova
                 model.rotate(Nova::rotateFromEuler(transform.rotation));
                 model.scale(transform.scale);
 
-                //Activate program and send matrices to shaders
-                GLuint program = defaultShader.getProgram();
-                glUseProgram(program);
-
-                GLuint modelLoc = glGetUniformLocation(program, "model");
-                GLuint viewLoc = glGetUniformLocation(program, "view");
-                GLuint projLoc = glGetUniformLocation(program, "proj");
-
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.data());
-                glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data());
-                glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj.data());
 
                 //Render the mesh
                 glBindVertexArray(mesh[i].VAO);
