@@ -39,24 +39,27 @@ void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, flo
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
 
-	if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 	{
-		cam.updatePosition(Nova::Editor::EditorCameraMovement::FORWARD, dt);
-	}
+		if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			cam.updatePosition(Nova::Editor::EditorCameraMovement::FORWARD, dt);
+		}
 
-	if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		cam.updatePosition(Nova::Editor::EditorCameraMovement::LEFT, dt);
-	}
+		if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			cam.updatePosition(Nova::Editor::EditorCameraMovement::LEFT, dt);
+		}
 
-	if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		cam.updatePosition(Nova::Editor::EditorCameraMovement::BACKWARD, dt);
-	}
+		if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			cam.updatePosition(Nova::Editor::EditorCameraMovement::BACKWARD, dt);
+		}
 
-	if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		cam.updatePosition(Nova::Editor::EditorCameraMovement::RIGHT, dt);
+		if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			cam.updatePosition(Nova::Editor::EditorCameraMovement::RIGHT, dt);
+		}
 	}
 }
 

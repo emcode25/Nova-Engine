@@ -120,17 +120,19 @@ void Nova::EditorUI::ShowObjectList(std::vector<flecs::entity>& objs, flecs::ent
             //Rename Objects (right-click)
             if (ImGui::BeginPopupContextItem())
             {
-                char rename[Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT];
+                static char rename[Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT];
                 ImGui::Text("Rename:");
                 ImGui::InputText("##rename", rename, IM_ARRAYSIZE(rename));
 
                 if (ImGui::Button("Close"))
                 {
-                    //Check for a new name if the window is closed
-                    if(e.doc_name() != rename)
+                    //New name if the string is non-empty
+                    if(strcmp(rename, "") != 0)
                     {
                         e.set_doc_name(rename);
                     }
+
+                    std::strcpy(rename, "");
                     ImGui::CloseCurrentPopup();
                 }
                 ImGui::EndPopup();
