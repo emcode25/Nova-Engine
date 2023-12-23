@@ -29,6 +29,7 @@ namespace Nova
             Nova::Component::Camera getCameraProperties();
 
             void updatePosition(const Nova::Editor::EditorCameraMovement& direction, float dt);
+            void updateDirection(float xoffset, float yoffset);
 
             Eigen::Matrix4f viewMatrix();
 
@@ -36,7 +37,7 @@ namespace Nova
             Nova::Component::Transform transform;
             Nova::Component::Camera cam;
             Eigen::Vector3f up, worldup, right, front;
-            float moveSpeed;
+            float moveSpeed, sensitivity;
 
             void updateCameraVectors();
         };

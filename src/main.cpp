@@ -79,6 +79,7 @@ namespace Nova
 
         //Set up callbacks
         glfwSetFramebufferSizeCallback(window, Nova::resizeCB);
+        glfwSetCursorPosCallback(window, mouseCB);
 
 
         //---------------GLAD---------------//

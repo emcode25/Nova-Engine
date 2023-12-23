@@ -6,6 +6,7 @@
 namespace Nova
 {
     void resizeCB(GLFWwindow* window, int width, int height);
+    void mouseCB(GLFWwindow* window, double xpos, double ypos);
 }
 
 #endif
