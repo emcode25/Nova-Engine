@@ -115,8 +115,8 @@ namespace Nova
 
         //---------------Nova---------------//
         //Create shader
-        defaultShader.init("../shaders/vertex.vert", "../shaders/fragment.frag");
-        activeObjShader.init("../shaders/active/vertex.vert", "../shaders/active/geometry.geom", "../shaders/active/fragment.frag");
+        defaultShader.init("../../../shaders/vertex.vert", "../../../shaders/fragment.frag");
+        activeObjShader.init("../../../shaders/active/vertex.vert", "../../../shaders/active/geometry.geom", "../../../shaders/active/fragment.frag");
 
         stbi_set_flip_vertically_on_load(true);
         

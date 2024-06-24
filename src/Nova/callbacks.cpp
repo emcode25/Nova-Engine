@@ -8,6 +8,7 @@ void Nova::resizeCB(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+//TODO: Stop stutter on mouse reentry to the window
 void Nova::mouseCB(GLFWwindow* window, double xpos, double ypos)
 {
     static float prevX = 0;
@@ -37,6 +38,7 @@ void Nova::mouseCB(GLFWwindow* window, double xpos, double ypos)
         prevX = xposf;
         prevY = yposf;
 
+        //TODO: Fix this horrible cheat
         //Cheat a little here, oops
         extern Nova::Editor::EditorCamera editorCamera;
         editorCamera.updateDirection(xoff, yoff);
