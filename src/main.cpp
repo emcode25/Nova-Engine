@@ -1,30 +1,4 @@
-#include <iostream>
-#include <string>
-#include <cmath>
-#include <chrono>
-#include <thread>
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-#include <flecs.h>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
-#include <Nova/const.hpp>
-#include <Nova/utils.hpp>
-#include <Nova/callbacks.hpp>
-#include <Nova/components.hpp>
-#include <Nova/objects.hpp>
-#include <Nova/shader.hpp>
-#include <Nova/ui.hpp>
-#include <Nova/editor_camera.hpp>
+#include <Nova/nova.hpp>
 
 std::vector<flecs::entity> cubes;
 
@@ -43,19 +17,37 @@ Eigen::Vector3f cubePositions[] = {
 
 namespace Nova
 {
+    //Records the time passed since the last frame
     float deltaTime = 0.0f;
+
+    //Records the time up to the last frame, to be used for deltaTime calculations
     float lastTime = 0.0f;
 
+    //The flecs world object that stores all information about every object and component
     flecs::world ecs;
+
+    //The context to apply graphics processes
     GLFWwindow* window;
 
-    std::vector<flecs::entity> entities; //Global id list of all entities
-    std::vector<Nova::Texture> globalTextures;
+    //Global ID list of all entities
+    std::vector<flecs::entity> entities;
+
+    //Global store for all textures
+    std::vector<std::shared_ptr<Nova::Texture>> globalTextures;
+
+    //The shader to apply editor effects
     Nova::Shader defaultShader;
+
+    //The shader for highlighting the active object
     Nova::Shader activeObjShader;
+
+    //The camera that the editor uses, not a part of the final game
     Nova::Editor::EditorCamera editorCamera;
+
+    //The object to highlight when editing the game
     flecs::entity activeObj;
 
+    //Begins graphics specific setup for items like GLFW, GLAD, ImGUI, etc.
     int initGraphics(void)
     {
         //---------------GLFW---------------//
@@ -125,6 +117,7 @@ namespace Nova
 
     int initECS()
     {
+        //TODO: Refactor
         //Render system includes transformation information
         auto renderSystem = Nova::ecs.system<const Nova::Component::Transform, const Nova::Component::Mesh>("Render")
         .iter([](flecs::iter& it, const Nova::Component::Transform* t, const Nova::Component::Mesh* mesh)
@@ -189,6 +182,7 @@ namespace Nova
                 GLuint program = activeObjShader.getProgram();
                 glUseProgram(program);
 
+                //TODO: Refactor
                 GLuint modelLoc = glGetUniformLocation(program, "model");
                 GLuint viewLoc = glGetUniformLocation(program, "view");
                 GLuint projLoc = glGetUniformLocation(program, "proj");

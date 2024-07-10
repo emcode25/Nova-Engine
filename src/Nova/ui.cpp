@@ -1,11 +1,16 @@
 #include <Nova/ui.hpp>
 
+#define NOVA_HPP_NO_HEADERS
+#include <Nova/nova.hpp>
+#undef NOVA_HPP_NO_HEADERS
+
 #include <Nova/components.hpp>
 #include <Nova/const.hpp>
 #include <Nova/objects.hpp>
 #include <Nova/utils.hpp>
 
 #include <imgui/imgui.h>
+#include <nfd.h>
 
 void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::vector<flecs::entity>& objs)
 {
@@ -30,6 +35,40 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
 
         if (ImGui::BeginMenu("Edit"))
         {
+            if (ImGui::MenuItem("Import Texture..."))
+            {
+#ifdef UNIMPLEMENTED
+                if (ImGui::Begin("Import Texture"))
+                {
+                    //Path text box
+                    static char textPath[Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT];
+                    ImGui::Text("Path:");
+                    ImGui::InputText("##path", textPath, IM_ARRAYSIZE(textPath));
+
+                    //Three dots box
+                    //If box pressed, get path
+                    //Add texture to the global textures and store
+                    char* path = NULL;
+                    nfdresult_t res = NFD_OpenDialog(NULL, NULL, &path);
+
+                    //Texture name box
+                    //Type dropdown
+                    //Accept/close button
+
+                    
+
+                    if (res == NFD_OKAY)
+                    {
+                        std::shared_ptr<Nova::Texture> containerTexture = Nova::loadTexture(path, Nova::TexType::DIFFUSE);
+                        globalTextures.push_back(containerTexture);
+                        free(path);
+                    }
+
+                    ImGui::End();
+                }
+#endif
+            }
+
             ImGui::EndMenu();
         }
 
@@ -113,8 +152,6 @@ void Nova::EditorUI::ShowObjectList(std::vector<flecs::entity>& objs, flecs::ent
             if (selected)
             {
                 ImGui::SetItemDefaultFocus();
-
-                //TODO: Highlight object in window
             }
 
             //Rename Objects (right-click)

@@ -25,10 +25,14 @@ Actions can be performed using the context menus.
 
 ## To Do
 
+- Add custom texture support
+- Add texture component for objects
+
 ## Issues
 
 - Rotation of objects is broken
 - Editor camera stutters when recapturing mouse
+- Camera roll does not work
 
 ## Contributing
 

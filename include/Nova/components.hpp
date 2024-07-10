@@ -2,6 +2,7 @@
 #define COMPONENTS_HPP
 
 #include <vector>
+#include <memory>
 
 #include <glad/glad.h>
 
@@ -31,7 +32,7 @@ namespace Nova
         {
             std::vector<Vertex>  vertices;
             std::vector<GLuint>  indices;
-            std::vector<Texture> textures;
+            std::vector<std::shared_ptr<Texture>> textures;
             GLuint VAO;
             GLuint VBO;
             GLuint EBO;

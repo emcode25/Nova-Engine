@@ -5,6 +5,10 @@
 #include <Nova/components.hpp>
 #include <Nova/utils.hpp>
 
+#define NOVA_HPP_NO_HEADERS
+#include <Nova/nova.hpp>
+#undef NOVA_HPP_NO_HEADERS
+
 constexpr int NUM_CUBE_VERTICES = 17;
 Nova::Vertex cubeVertices[] = 
 {   //Position              Normals       UVs
@@ -45,7 +49,8 @@ GLuint cubeIndices[] =
 flecs::entity Nova::createCube(const flecs::world& ecs)
 {
     //Cube texture
-    static const Nova::Texture containerTexture = Nova::loadTexture("../../../data/textures/container.jpg", Nova::TexType::DIFFUSE);
+    static std::shared_ptr<Nova::Texture> containerTexture = Nova::loadTexture("../../../data/textures/container.jpg", Nova::TexType::DIFFUSE);
+    globalTextures.push_back(containerTexture);
 
     //Create cube and add basic Transform
 	flecs::entity cube = ecs.entity();
@@ -63,7 +68,7 @@ flecs::entity Nova::createCube(const flecs::world& ecs)
     //Set mesh properties for use in GL commands
     mesh.vertices = std::vector<Nova::Vertex>(std::begin(cubeVertices), std::end(cubeVertices));
     mesh.indices  = std::vector<GLuint>(std::begin(cubeIndices), std::end(cubeIndices));
-    mesh.textures = std::vector<Nova::Texture>();
+    mesh.textures = std::vector<std::shared_ptr<Nova::Texture>>();
     mesh.textures.push_back(containerTexture);
     mesh.VAO = VAO;
     mesh.VBO = VBO;

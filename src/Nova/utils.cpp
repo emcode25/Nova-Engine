@@ -63,9 +63,9 @@ void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, flo
 	}
 }
 
-Nova::Texture Nova::loadTexture(const char* filename, Nova::TexType type)
+std::shared_ptr<Nova::Texture> Nova::loadTexture(const char* filename, Nova::TexType type)
 {
-	Nova::Texture tex{};
+	std::shared_ptr<Nova::Texture> tex = std::make_shared<Nova::Texture>();
 
 	//Create the texture object
 	GLuint textureObj;
@@ -105,8 +105,8 @@ Nova::Texture Nova::loadTexture(const char* filename, Nova::TexType type)
 		//Clean up and get the texture struct ready
 		stbi_image_free(data);
 
-		tex.texture = textureObj;
-		tex.type = type;
+		tex->texture = textureObj;
+		tex->type = type;
 	}
 	else
 	{

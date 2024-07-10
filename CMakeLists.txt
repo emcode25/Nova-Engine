@@ -65,12 +65,18 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(FATAL_ERROR "dl not found.")
   endif()
 
-  set(LIBS glfw GL X11 pthread Xrandr Xi dl)
+  find_library(LIB_NFD nfd)
+  if(NOT LIB_NFD)
+    message(FATAL_ERROR "nfd not found.")
+  endif()
+
+  set(LIBS glfw GL X11 pthread Xrandr Xi dl nfd)
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
   find_library(GLFW3 glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-  set(LIBS ${GLFW3} opengl32)
+  find_library(NFD nfd PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+  set(LIBS ${GLFW3} ${NFD} opengl32 comctl32)
 endif()
 
 # Find directories and libraries
