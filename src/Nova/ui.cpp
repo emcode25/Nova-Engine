@@ -14,6 +14,7 @@
 
 void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::vector<flecs::entity>& objs)
 {
+    static bool texWindowOpen = false;
     bool quit = false;
 
     if (ImGui::BeginMainMenuBar())
@@ -37,36 +38,7 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
         {
             if (ImGui::MenuItem("Import Texture..."))
             {
-#ifdef UNIMPLEMENTED
-                if (ImGui::Begin("Import Texture"))
-                {
-                    //Path text box
-                    static char textPath[Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT];
-                    ImGui::Text("Path:");
-                    ImGui::InputText("##path", textPath, IM_ARRAYSIZE(textPath));
-
-                    //Three dots box
-                    //If box pressed, get path
-                    //Add texture to the global textures and store
-                    char* path = NULL;
-                    nfdresult_t res = NFD_OpenDialog(NULL, NULL, &path);
-
-                    //Texture name box
-                    //Type dropdown
-                    //Accept/close button
-
-                    
-
-                    if (res == NFD_OKAY)
-                    {
-                        std::shared_ptr<Nova::Texture> containerTexture = Nova::loadTexture(path, Nova::TexType::DIFFUSE);
-                        globalTextures.push_back(containerTexture);
-                        free(path);
-                    }
-
-                    ImGui::End();
-                }
-#endif
+                texWindowOpen = true;
             }
 
             ImGui::EndMenu();
@@ -100,6 +72,74 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
         
         ImGui::EndMainMenuBar();
     }
+
+#ifndef UNIMPLEMENTED
+
+    if(texWindowOpen)
+    {
+        ImGui::Begin("Import Texture", &texWindowOpen);
+
+        //Path text box
+        static nfdresult_t res;
+        static char texPath[Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT];
+        ImGui::Text("Path:");
+        ImGui::InputText("##path", texPath, IM_ARRAYSIZE(texPath));
+
+        //Three dots box
+        //If box pressed, get path
+        if (ImGui::Button("Browse"))
+        {
+            char* path = NULL;
+            res = NFD_OpenDialog(NULL, NULL, &path);
+            strncpy(texPath, path, Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT);
+            free(path);
+        }
+
+        //Texture name box
+        static char name[Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT];
+        ImGui::Text("Name:");
+        ImGui::InputText("##new_tex_name", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_::ImGuiInputTextFlags_CharsNoBlank);
+        //TODO: set name for texture
+
+        //Type dropdown
+        const char* texTypes[] = { "Diffuse", "Specular" };
+        static Nova::TexType typeSelected = Nova::TexType::DIFFUSE;
+        const char* comboPreview = texTypes[static_cast<int>(typeSelected)];
+
+        if (ImGui::BeginCombo("Texture Type:", comboPreview))
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(texTypes); n++)
+            {
+                const bool isSelected = (static_cast<int>(typeSelected) == n);
+                if (ImGui::Selectable(texTypes[n], isSelected))
+                {
+                    typeSelected = static_cast<TexType>(n);
+                }
+
+                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                if (isSelected)
+                {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        //Accept/close button
+        if (ImGui::Button("Finish"))
+        {
+            if (res == NFD_OKAY)
+            {
+                std::shared_ptr<Nova::Texture> containerTexture = Nova::loadTexture(texPath, typeSelected);
+                globalTextures.push_back(containerTexture);
+            }
+
+            texWindowOpen = false;
+        }
+
+        ImGui::End();
+    }
+#endif
 }
 
 void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)

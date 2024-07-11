@@ -49,8 +49,15 @@ GLuint cubeIndices[] =
 flecs::entity Nova::createCube(const flecs::world& ecs)
 {
     //Cube texture
-    static std::shared_ptr<Nova::Texture> containerTexture = Nova::loadTexture("../../../data/textures/container.jpg", Nova::TexType::DIFFUSE);
-    globalTextures.push_back(containerTexture);
+    static bool textureAdded = false;
+    static std::shared_ptr<Nova::Texture> containerTexture;
+
+    if (!textureAdded)
+    {
+        containerTexture = Nova::loadTexture("../../../data/textures/container.jpg", Nova::TexType::DIFFUSE);
+        globalTextures.push_back(containerTexture);
+        textureAdded = true;
+    }
 
     //Create cube and add basic Transform
 	flecs::entity cube = ecs.entity();

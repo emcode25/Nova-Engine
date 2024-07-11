@@ -151,6 +151,7 @@ namespace Nova
             glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data());
             glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj.data());
 
+            //Iterate through each object
             for (auto i : it)
             {
                 //Modify transform properties (locally)
@@ -164,11 +165,19 @@ namespace Nova
 
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.data());
 
+                //Attach textures
+                for (int j = 0; j < mesh[i].textures.size(); ++j)
+                {
+                    glActiveTexture(GL_TEXTURE0 + j);
+                    glBindTexture(GL_TEXTURE_2D, mesh[i].textures[j]->texture);
+                }
+
                 //Render the mesh
                 glBindVertexArray(mesh[i].VAO);
                 glDrawElements(GL_TRIANGLES, mesh[i].indices.size(), GL_UNSIGNED_INT, 0);
             }
 
+            //Active object gets another pass to run the geometry shader
             if(activeObj.has<Nova::Component::Mesh>())
             {
                 //Get the active object and do the same transform stuff
