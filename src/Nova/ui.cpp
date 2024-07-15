@@ -73,8 +73,6 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
         ImGui::EndMainMenuBar();
     }
 
-#ifndef UNIMPLEMENTED
-
     if(texWindowOpen)
     {
         ImGui::Begin("Import Texture", &texWindowOpen);
@@ -99,19 +97,19 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
         static char name[Nova::CONST::OBJECT_NAME_CHARACTER_LIMIT];
         ImGui::Text("Name:");
         ImGui::InputText("##new_tex_name", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_::ImGuiInputTextFlags_CharsNoBlank);
-        //TODO: set name for texture
+        //TODO: Handle when no name is given
 
         //Type dropdown
-        const char* texTypes[] = { "Diffuse", "Specular" };
+        const char* texTypeNames[] = { "Diffuse", "Specular" };
         static Nova::TexType typeSelected = Nova::TexType::DIFFUSE;
-        const char* comboPreview = texTypes[static_cast<int>(typeSelected)];
+        const char* comboPreview = texTypeNames[static_cast<int>(typeSelected)];
 
-        if (ImGui::BeginCombo("Texture Type:", comboPreview))
+        if (ImGui::BeginCombo("Texture Type", comboPreview))
         {
-            for (int n = 0; n < IM_ARRAYSIZE(texTypes); n++)
+            for (int n = 0; n < IM_ARRAYSIZE(texTypeNames); n++)
             {
                 const bool isSelected = (static_cast<int>(typeSelected) == n);
-                if (ImGui::Selectable(texTypes[n], isSelected))
+                if (ImGui::Selectable(texTypeNames[n], isSelected))
                 {
                     typeSelected = static_cast<TexType>(n);
                 }
@@ -130,8 +128,7 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
         {
             if (res == NFD_OKAY)
             {
-                std::shared_ptr<Nova::Texture> containerTexture = Nova::loadTexture(texPath, typeSelected);
-                globalTextures.push_back(containerTexture);
+                Nova::Texture* containerTexture = Nova::loadTexture(name, texPath, typeSelected, globalTextures);
             }
 
             texWindowOpen = false;
@@ -139,11 +136,60 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
 
         ImGui::End();
     }
-#endif
+}
+
+//Displays the combo tool for texture selection
+//Returns true when a selection has occurred, indexSelected will reflect what was selected
+bool textureNameCombo(int& indexSelected, std::vector<Nova::Texture*>& textureSet)
+{
+    if (indexSelected < 0 || indexSelected > textureSet.size())
+    {
+        return false;
+    }
+
+    bool selectionHappened = false;
+    if (ImGui::BeginCombo("Texture", textureSet[indexSelected]->name.c_str()))
+    {
+        for (int i = 0; i < textureSet.size(); i++)
+        {
+            const bool isSelected = (indexSelected == i);
+            if (ImGui::Selectable(textureSet[i]->name.c_str(), isSelected))
+            {
+                indexSelected = i;
+                selectionHappened = true;
+            }
+
+            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+            if (isSelected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+
+        ImGui::EndCombo();
+    }
+
+    return selectionHappened;
+}
+
+int findTextureIndex(Nova::Texture* texture, std::vector<Nova::Texture*>& textureSet)
+{
+    for (int i = 0; i < textureSet.size(); ++i)
+    {
+        if (textureSet[i] == texture)
+        {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)
 {
+    static auto prevObj = obj;
+    bool newObj = (prevObj != obj) ? true : false;
+
     if(ImGui::Begin("Object Components"))
     {
         auto activeTransform = obj.get_ref<Nova::Component::Transform>();
@@ -163,9 +209,30 @@ void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)
             ImGui::DragFloat("Near", &(camProps->zNear), 0.1f, 0.0f, 0.0f, "%.1f");
             ImGui::DragFloat("Far", &(camProps->zFar), 0.1f, 0.0f, 0.0f, "%.1f");
         }
+
+        //TODO: Allow view of all textures in a mesh
+        if(obj.has<Nova::Component::Mesh>() && ImGui::CollapsingHeader("Mesh"))
+        {
+            auto meshProps = obj.get_ref<Nova::Component::Mesh>();
+            Nova::Texture* texSelected = meshProps->textures[0];
+            static int indexSelected = findTextureIndex(texSelected, globalTextures);
+
+            //Recheck index for texture if a new object is found
+            if (newObj)
+            {
+                indexSelected = findTextureIndex(texSelected, globalTextures);
+            }
+
+            if (textureNameCombo(indexSelected, globalTextures))
+            {
+                meshProps->textures[0] = globalTextures[indexSelected];
+            }
+        }
     }
 
     ImGui::End();
+
+    prevObj = obj;
 }
 
 void Nova::EditorUI::ShowObjectList(std::vector<flecs::entity>& objs, flecs::entity& activeObj)

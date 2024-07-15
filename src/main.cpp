@@ -33,7 +33,7 @@ namespace Nova
     std::vector<flecs::entity> entities;
 
     //Global store for all textures
-    std::vector<std::shared_ptr<Nova::Texture>> globalTextures;
+    std::vector<Nova::Texture*> globalTextures;
 
     //The shader to apply editor effects
     Nova::Shader defaultShader;
@@ -288,6 +288,8 @@ namespace Nova
 
     void quit()
     {
+        deleteTextures(globalTextures);
+
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();

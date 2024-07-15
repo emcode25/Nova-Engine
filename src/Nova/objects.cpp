@@ -50,12 +50,11 @@ flecs::entity Nova::createCube(const flecs::world& ecs)
 {
     //Cube texture
     static bool textureAdded = false;
-    static std::shared_ptr<Nova::Texture> containerTexture;
+    static Nova::Texture* containerTexture;
 
     if (!textureAdded)
     {
-        containerTexture = Nova::loadTexture("../../../data/textures/container.jpg", Nova::TexType::DIFFUSE);
-        globalTextures.push_back(containerTexture);
+        containerTexture = Nova::loadTexture("Cube", "../../../data/textures/container.jpg", Nova::TexType::DIFFUSE, globalTextures);
         textureAdded = true;
     }
 
@@ -75,7 +74,7 @@ flecs::entity Nova::createCube(const flecs::world& ecs)
     //Set mesh properties for use in GL commands
     mesh.vertices = std::vector<Nova::Vertex>(std::begin(cubeVertices), std::end(cubeVertices));
     mesh.indices  = std::vector<GLuint>(std::begin(cubeIndices), std::end(cubeIndices));
-    mesh.textures = std::vector<std::shared_ptr<Nova::Texture>>();
+    mesh.textures = std::vector<Nova::Texture*>();
     mesh.textures.push_back(containerTexture);
     mesh.VAO = VAO;
     mesh.VBO = VBO;

@@ -32,7 +32,7 @@ namespace Nova
         {
             std::vector<Vertex>  vertices;
             std::vector<GLuint>  indices;
-            std::vector<std::shared_ptr<Texture>> textures;
+            std::vector<Texture*> textures;
             GLuint VAO;
             GLuint VBO;
             GLuint EBO;

@@ -38,7 +38,7 @@
 
 namespace Nova
 {
-	extern std::vector<std::shared_ptr<Nova::Texture>> globalTextures;
+	extern std::vector<Nova::Texture*> globalTextures;
 }
 
 #endif

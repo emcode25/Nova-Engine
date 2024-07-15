@@ -63,9 +63,18 @@ void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, flo
 	}
 }
 
-std::shared_ptr<Nova::Texture> Nova::loadTexture(const char* filename, Nova::TexType type)
+Nova::Texture* Nova::loadTexture(std::string name, const char* filename, Nova::TexType type, std::vector<Nova::Texture*>& textureSet)
 {
-	std::shared_ptr<Nova::Texture> tex = std::make_shared<Nova::Texture>();
+	for(auto texture : textureSet)
+	{
+		if(texture->name == name)
+		{
+			std::cerr << "ERROR: Failed to load texture: " << filename <<  ", name is already taken." << std::endl;
+			return NULL;
+		}
+	}
+
+	Nova::Texture* tex = new Nova::Texture();
 
 	//Create the texture object
 	GLuint textureObj;
@@ -107,13 +116,27 @@ std::shared_ptr<Nova::Texture> Nova::loadTexture(const char* filename, Nova::Tex
 
 		tex->texture = textureObj;
 		tex->type = type;
+		tex->name = name;
+
+		textureSet.push_back(tex);
 	}
 	else
 	{
 		std::cerr << "ERROR: Failed to load texture: " << filename << std::endl;
+
+		delete tex;
+		return nullptr;
 	}
 
 	return tex;
+}
+
+void Nova::deleteTextures(std::vector<Nova::Texture*>& textureSet)
+{
+	for (auto texture : textureSet)
+	{
+		delete texture;
+	}
 }
 
 Eigen::Matrix4f Nova::lookAt(const Eigen::Vector3f& position, const Eigen::Vector3f& target, const Eigen::Vector3f& up)

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 
 #include <GLFW/glfw3.h>
 #include <Eigen/Core>
@@ -17,7 +18,8 @@ namespace Nova
     void processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, float dt);
     std::string readFileToString(const char* filename);
 
-    std::shared_ptr<Nova::Texture> loadTexture(const char* filename, Nova::TexType type);
+    Nova::Texture* loadTexture(std::string name, const char* filename, Nova::TexType type, std::vector<Nova::Texture*>& textureSet);
+    void deleteTextures(std::vector<Nova::Texture*>& textureSet);
 
     Eigen::Matrix4f lookAt(const Eigen::Vector3f& position, const Eigen::Vector3f& target, const Eigen::Vector3f& up = {0.0f, 1.0f, 0.0f});
     Eigen::Matrix4f makePerspective(float aspectRatio, float fov, float near, float far);

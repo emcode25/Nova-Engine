@@ -1,6 +1,8 @@
 #ifndef STRUCTS_HPP
 #define STRUCTS_HPP
 
+#include <string>
+
 #include <Nova/enums.hpp>
 
 namespace Nova
@@ -16,6 +18,7 @@ namespace Nova
     struct Texture
     {
         unsigned int texture;
+        std::string name;
         Nova::TexType type;
     };
 }
