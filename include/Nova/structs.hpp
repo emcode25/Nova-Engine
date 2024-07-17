@@ -21,6 +21,13 @@ namespace Nova
         std::string name;
         Nova::TexType type;
     };
+
+    struct BaseLight
+    {
+        Eigen::Vector3f ambient;
+        Eigen::Vector3f diffuse;
+        Eigen::Vector3f specular;
+    };
 }
 
 #endif

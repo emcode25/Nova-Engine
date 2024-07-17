@@ -172,6 +172,7 @@ bool textureNameCombo(int& indexSelected, std::vector<Nova::Texture*>& textureSe
     return selectionHappened;
 }
 
+//Returns the index if a texture is found, -1 otherwise
 int findTextureIndex(Nova::Texture* texture, std::vector<Nova::Texture*>& textureSet)
 {
     for (int i = 0; i < textureSet.size(); ++i)
@@ -210,22 +211,26 @@ void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)
             ImGui::DragFloat("Far", &(camProps->zFar), 0.1f, 0.0f, 0.0f, "%.1f");
         }
 
-        //TODO: Allow view of all textures in a mesh
         if(obj.has<Nova::Component::Mesh>() && ImGui::CollapsingHeader("Mesh"))
         {
             auto meshProps = obj.get_ref<Nova::Component::Mesh>();
-            Nova::Texture* texSelected = meshProps->textures[0];
-            static int indexSelected = findTextureIndex(texSelected, globalTextures);
+            static std::vector<int> indexSelected(Nova::CONST::OPENGL_SHADER_TEXTURE_MAX);
 
-            //Recheck index for texture if a new object is found
-            if (newObj)
+            for (int i = 0; i < meshProps->textures.size(); ++i)
             {
-                indexSelected = findTextureIndex(texSelected, globalTextures);
-            }
+                Nova::Texture* texSelected = meshProps->textures[i];
+                indexSelected[i] = findTextureIndex(texSelected, globalTextures);
 
-            if (textureNameCombo(indexSelected, globalTextures))
-            {
-                meshProps->textures[0] = globalTextures[indexSelected];
+                //Recheck index for texture if a new object is found
+                if (newObj)
+                {
+                    indexSelected[i] = findTextureIndex(texSelected, globalTextures);
+                }
+
+                if (textureNameCombo(indexSelected[i], globalTextures))
+                {
+                    meshProps->textures[i] = globalTextures[indexSelected[i]];
+                }
             }
         }
     }

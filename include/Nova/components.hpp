@@ -45,6 +45,12 @@ namespace Nova
             float zFar;
         };
 
+        struct DirectionalLight
+        {
+            BaseLight base;
+            Eigen::Vector3f direction;
+        };
+
         const Camera DEFAULT_CAMERA = {45.0f, 1.0f, 100.0f};
     }
 }
