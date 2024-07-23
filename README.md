@@ -1,6 +1,5 @@
 # Nova Engine
-
-A toy OpenGL game engine for exploring shader techniques, ECS design, and game programming topics.
+An exploratory game engine to practice concepts in computer graphics, large scale development, and game programming. 
 
 ## Installation
 
