@@ -55,6 +55,9 @@ namespace Nova
     //The object to highlight when editing the game
     flecs::entity activeObj;
 
+    //The shader program to use when rendering
+    GLuint activeProgram;
+
     //Begins graphics specific setup for items like GLFW, GLAD, ImGUI, etc.
     int initGraphics(void)
     {
@@ -152,12 +155,11 @@ namespace Nova
 
             //Loop setup
             //Activate program and send matrices to shaders
-            GLuint program = unlitShader.getProgram();
-            glUseProgram(program);
+            glUseProgram(activeProgram);
 
-            GLuint modelLoc = glGetUniformLocation(program, "model");
-            GLuint viewLoc = glGetUniformLocation(program, "view");
-            GLuint projLoc = glGetUniformLocation(program, "proj");
+            GLuint modelLoc = glGetUniformLocation(activeProgram, "model");
+            GLuint viewLoc = glGetUniformLocation(activeProgram, "view");
+            GLuint projLoc = glGetUniformLocation(activeProgram, "proj");
 
             glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data());
             glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj.data());
@@ -249,6 +251,7 @@ namespace Nova
         entities.push_back(cam);
 
         activeObj = cam;
+        activeProgram = forwardShader.getProgram();
 
         return 0;
     }

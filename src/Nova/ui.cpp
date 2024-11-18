@@ -44,6 +44,26 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("View"))
+        {
+            if (ImGui::BeginMenu("Lighting Mode"))
+            {
+                if (ImGui::MenuItem("Default"))
+                {
+                    //TODO: Add ability to change lighting type
+                }
+
+                if (ImGui::MenuItem("Lit"))
+                {
+                    //TODO: Add ability to change lighting type
+                }
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMenu();
+        }
+
         if (ImGui::BeginMenu("Object"))
         {
             if (ImGui::BeginMenu("New Object"))
