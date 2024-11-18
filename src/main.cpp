@@ -1,5 +1,7 @@
 #include <Nova/nova.hpp>
 
+#define SHADER_PATH(filename) ("../../../shaders/" ## filename)
+
 std::vector<flecs::entity> cubes;
 
 Eigen::Vector3f cubePositions[] = {
@@ -113,10 +115,10 @@ namespace Nova
 
         //---------------Nova---------------//
         //Create shader
-        unlitShader.init("../../../shaders/vertex.vert", "../../../shaders/unlit.frag");
-        //forwardShader.init("../../../shaders/vertex.vert", "../../../shaders/forward.frag");
-        lightSourceShader.init("../../../shaders/lights/vertex.vert", "../../../shaders/lights/fragment.frag");
-        activeObjShader.init("../../../shaders/active/vertex.vert", "../../../shaders/active/geometry.geom", "../../../shaders/active/fragment.frag");
+        unlitShader.init(SHADER_PATH("vertex.vert"), SHADER_PATH("unlit.frag"));
+        forwardShader.init(SHADER_PATH("vertex.vert"), SHADER_PATH("forward.frag"));
+        lightSourceShader.init(SHADER_PATH("lights/vertex.vert"), SHADER_PATH("lights/fragment.frag"));
+        activeObjShader.init(SHADER_PATH("active/vertex.vert"), SHADER_PATH("active/geometry.geom"), SHADER_PATH("active/fragment.frag"));
 
         stbi_set_flip_vertically_on_load(true);
         
