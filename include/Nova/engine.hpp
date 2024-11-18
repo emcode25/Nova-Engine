@@ -2,6 +2,8 @@
 
 #include <vector>
 #include "components.hpp"
+#include "shader.hpp"
+#include "editor_camera.hpp"
 
 namespace Nova
 {
@@ -9,7 +11,7 @@ namespace Nova
     extern float deltaTime;
 
     //Records the time up to the last frame, to be used for deltaTime calculations
-    extern float lastTime = 0.0f;
+    extern float lastTime;
 
     //The flecs world object that stores all information about every object and component
     extern flecs::world ecs;

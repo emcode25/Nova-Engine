@@ -50,12 +50,12 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
             {
                 if (ImGui::MenuItem("Default"))
                 {
-                    //TODO: Add ability to change lighting type
+                    Nova::activeProgram = Nova::forwardShader.getProgram();
                 }
 
-                if (ImGui::MenuItem("Lit"))
+                if (ImGui::MenuItem("Unlit"))
                 {
-                    //TODO: Add ability to change lighting type
+                    Nova::activeProgram = Nova::unlitShader.getProgram();
                 }
 
                 ImGui::EndMenu();
