@@ -33,12 +33,6 @@
 
 #endif
 
-#include <vector>
-#include "components.hpp"
-
-namespace Nova
-{
-	extern std::vector<Nova::Texture*> globalTextures;
-}
+#include "engine.hpp"
 
 #endif

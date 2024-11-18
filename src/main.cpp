@@ -19,44 +19,24 @@ Eigen::Vector3f cubePositions[] = {
 
 namespace Nova
 {
-    //Records the time passed since the last frame
     float deltaTime = 0.0f;
-
-    //Records the time up to the last frame, to be used for deltaTime calculations
     float lastTime = 0.0f;
-
-    //The flecs world object that stores all information about every object and component
-    flecs::world ecs;
-
-    //The context to apply graphics processes
+    
     GLFWwindow* window;
-
-    //Global ID list of all entities
-    std::vector<flecs::entity> entities;
-
-    //Global store for all textures
+    
     std::vector<Nova::Texture*> globalTextures;
-
-    //The shader to use without lighting
+    
     Nova::Shader unlitShader;
-
-    //The shader to apply editor effects
     Nova::Shader forwardShader;
-
-    //The shader to apply to light sources
     Nova::Shader lightSourceShader;
-
-    //The shader for highlighting the active object
     Nova::Shader activeObjShader;
+    GLuint activeProgram;
 
-    //The camera that the editor uses, not a part of the final game
     Nova::Editor::EditorCamera editorCamera;
 
-    //The object to highlight when editing the game
+    flecs::world ecs;
     flecs::entity activeObj;
-
-    //The shader program to use when rendering
-    GLuint activeProgram;
+    std::vector<flecs::entity> entities;
 
     //Begins graphics specific setup for items like GLFW, GLAD, ImGUI, etc.
     int initGraphics(void)
