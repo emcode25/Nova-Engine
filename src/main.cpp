@@ -35,6 +35,9 @@ namespace Nova
     //Global store for all textures
     std::vector<Nova::Texture*> globalTextures;
 
+    //The shader to use without lighting
+    Nova::Shader unlitShader;
+
     //The shader to apply editor effects
     Nova::Shader forwardShader;
 
@@ -110,7 +113,8 @@ namespace Nova
 
         //---------------Nova---------------//
         //Create shader
-        forwardShader.init("../../../shaders/vertex.vert", "../../../shaders/forward.frag");
+        unlitShader.init("../../../shaders/vertex.vert", "../../../shaders/unlit.frag");
+        //forwardShader.init("../../../shaders/vertex.vert", "../../../shaders/forward.frag");
         lightSourceShader.init("../../../shaders/lights/vertex.vert", "../../../shaders/lights/fragment.frag");
         activeObjShader.init("../../../shaders/active/vertex.vert", "../../../shaders/active/geometry.geom", "../../../shaders/active/fragment.frag");
 
@@ -146,7 +150,7 @@ namespace Nova
 
             //Loop setup
             //Activate program and send matrices to shaders
-            GLuint program = forwardShader.getProgram();
+            GLuint program = unlitShader.getProgram();
             glUseProgram(program);
 
             GLuint modelLoc = glGetUniformLocation(program, "model");
@@ -158,8 +162,8 @@ namespace Nova
 
             while (it.next())
             {
-                auto transforms = it.field<Nova::Component::Transform>(0);
-                auto meshes = it.field<Nova::Component::Mesh>(1);
+                auto transforms = it.field<const Nova::Component::Transform>(0);
+                auto meshes = it.field<const Nova::Component::Mesh>(1);
 
                 //Iterate through each object
                 for (auto i : it)

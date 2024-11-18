@@ -48,17 +48,20 @@ int Nova::Shader::init(const char* vertexFilename, const char* fragmentFilename)
     temp = vertexCode.c_str();
     glShaderSource(vertexShader, 1, &temp, NULL);
     glCompileShader(vertexShader);
+    checkCompileErrors(vertexShader, "SHADER");
 
     GLuint fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     temp = fragmentCode.c_str();
     glShaderSource(fragmentShader, 1, &temp, NULL);
     glCompileShader(fragmentShader);
+    checkCompileErrors(fragmentShader, "SHADER");
 
     program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
     glLinkProgram(program);
+    checkCompileErrors(vertexShader, "PROGRAM");
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
