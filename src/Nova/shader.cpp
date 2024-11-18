@@ -30,7 +30,8 @@ void checkCompileErrors(unsigned int shader, std::string type)
 
 Nova::Shader::Shader()
 {
-    program = (GLuint)-1; //Max uint possible
+    //TODO: Make program an optional value
+    program = static_cast<GLuint>(-1); //Max uint possible
 }
 
 //Init is necessary because shader creation needs to be after OpenGL initializes,

@@ -51,6 +51,16 @@ namespace Nova
             Eigen::Vector3f direction;
         };
 
+        struct PointLight
+        {
+            BaseLight base;
+            Eigen::Vector3f position;
+
+            float constant;
+            float linear;
+            float quadratic;
+        };
+
         const Camera DEFAULT_CAMERA = {45.0f, 1.0f, 100.0f};
     }
 }

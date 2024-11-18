@@ -36,7 +36,10 @@ namespace Nova
     std::vector<Nova::Texture*> globalTextures;
 
     //The shader to apply editor effects
-    Nova::Shader defaultShader;
+    Nova::Shader forwardShader;
+
+    //The shader to apply to light sources
+    Nova::Shader lightSourceShader;
 
     //The shader for highlighting the active object
     Nova::Shader activeObjShader;
@@ -107,7 +110,8 @@ namespace Nova
 
         //---------------Nova---------------//
         //Create shader
-        defaultShader.init("../../../shaders/vertex.vert", "../../../shaders/fragment.frag");
+        forwardShader.init("../../../shaders/vertex.vert", "../../../shaders/forward.frag");
+        lightSourceShader.init("../../../shaders/lights/vertex.vert", "../../../shaders/lights/fragment.frag");
         activeObjShader.init("../../../shaders/active/vertex.vert", "../../../shaders/active/geometry.geom", "../../../shaders/active/fragment.frag");
 
         stbi_set_flip_vertically_on_load(true);
@@ -117,10 +121,11 @@ namespace Nova
 
     int initECS()
     {
+        //TODO: Redo for lights
         //TODO: Refactor
         //Render system includes transformation information
-        auto renderSystem = Nova::ecs.system<const Nova::Component::Transform, const Nova::Component::Mesh>("Render")
-        .iter([](flecs::iter& it, const Nova::Component::Transform* t, const Nova::Component::Mesh* mesh)
+        auto renderSystem = Nova::ecs.system<const Nova::Component::Transform, const Nova::Component::Mesh>("Object Render")
+        .run([](flecs::iter& it)
         {
             static auto cam = editorCamera.getCameraProperties();
 
@@ -141,7 +146,7 @@ namespace Nova
 
             //Loop setup
             //Activate program and send matrices to shaders
-            GLuint program = defaultShader.getProgram();
+            GLuint program = forwardShader.getProgram();
             glUseProgram(program);
 
             GLuint modelLoc = glGetUniformLocation(program, "model");
@@ -151,34 +156,41 @@ namespace Nova
             glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data());
             glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj.data());
 
-            //Iterate through each object
-            for (auto i : it)
+            while (it.next())
             {
-                //Modify transform properties (locally)
-                Nova::Component::Transform transform = t[i];
+                auto transforms = it.field<Nova::Component::Transform>(0);
+                auto meshes = it.field<Nova::Component::Mesh>(1);
 
-                //Perform world space transformations
-                Eigen::Affine3f model = Eigen::Affine3f::Identity();
-                model.translate(transform.position);
-                model.rotate(Nova::rotateFromEuler(transform.rotation));
-                model.scale(transform.scale);
-
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.data());
-
-                //Attach textures
-                for (int j = 0; j < mesh[i].textures.size(); ++j)
+                //Iterate through each object
+                for (auto i : it)
                 {
-                    glActiveTexture(GL_TEXTURE0 + j);
-                    glBindTexture(GL_TEXTURE_2D, mesh[i].textures[j]->texture);
-                }
+                    //Modify transform properties (locally)
+                    Nova::Component::Transform transform = transforms[i];
+                    Nova::Component::Mesh mesh = meshes[i];
 
-                //Render the mesh
-                glBindVertexArray(mesh[i].VAO);
-                glDrawElements(GL_TRIANGLES, mesh[i].indices.size(), GL_UNSIGNED_INT, 0);
+                    //Perform world space transformations
+                    Eigen::Affine3f model = Eigen::Affine3f::Identity();
+                    model.translate(transform.position);
+                    model.rotate(Nova::rotateFromEuler(transform.rotation));
+                    model.scale(transform.scale);
+
+                    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.data());
+
+                    //Attach textures
+                    for (int j = 0; j < mesh.textures.size(); ++j)
+                    {
+                        glActiveTexture(GL_TEXTURE0 + j);
+                        glBindTexture(GL_TEXTURE_2D, mesh.textures[j]->texture);
+                    }
+
+                    //Render the mesh
+                    glBindVertexArray(mesh.VAO);
+                    glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+                }
             }
 
             //Active object gets another pass to run the geometry shader
-            if(activeObj.has<Nova::Component::Mesh>())
+            if (activeObj.has<Nova::Component::Mesh>())
             {
                 //Get the active object and do the same transform stuff
                 auto activeTransform = activeObj.get_ref<Nova::Component::Transform>();
