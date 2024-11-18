@@ -30,6 +30,7 @@
 #include "shader.hpp"
 #include "ui.hpp"
 #include "editor_camera.hpp"
+#include "systems.hpp"
 
 #endif
 

@@ -2,11 +2,13 @@
 #define OBJECTS_HPP
 
 #include <flecs.h>
+#include <Nova/components.hpp>
 
 namespace Nova
 {
-	flecs::entity createCube(const flecs::world& ecs);
-	flecs::entity createCamera(const flecs::world& ecs);
+	flecs::entity createCube();
+	flecs::entity createCamera();
+	flecs::entity createLightCube(const Nova::Component::PointLight& props);
 }
 
 #endif

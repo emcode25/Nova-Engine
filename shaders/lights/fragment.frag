@@ -1,19 +1,12 @@
 #version 460 core
 
 //-------------VARIABLES-------------//
-in vec3 FragPos;
-in vec3 Normal;
-in vec2 UV;
-
 out vec4 FragColor;
 
 //Vectors
-uniform vec4 lightColor;
-
-//Samplers
-uniform sampler2D tex1;
+uniform vec3 lightColor;
 
 void main()
 {
-	FragColor = lightColor;
+	FragColor = vec4(lightColor, 1.0);
 }

@@ -54,7 +54,6 @@ namespace Nova
         struct PointLight
         {
             BaseLight base;
-            Eigen::Vector3f position;
 
             float constant;
             float linear;

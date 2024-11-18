@@ -1,4 +1,5 @@
 #ifndef ENGINE_HPP
+#define ENGINE_HPP
 
 #include <vector>
 #include "components.hpp"

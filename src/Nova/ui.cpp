@@ -70,7 +70,7 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
             {
                 if (ImGui::MenuItem("Cube"))
                 {
-                    auto cube = Nova::createCube(ecs);
+                    auto cube = Nova::createCube();
                     cube.set_doc_name("Cube");
 
                     objs.push_back(cube);
@@ -78,7 +78,7 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
 
                 if (ImGui::MenuItem("Camera"))
                 {
-                    auto cam = Nova::createCamera(ecs);
+                    auto cam = Nova::createCamera();
                     cam.set_doc_name("Camera");
 
                     objs.push_back(cam);
