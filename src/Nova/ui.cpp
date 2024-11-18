@@ -253,6 +253,19 @@ void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)
                 }
             }
         }
+
+        if (obj.has<Nova::Component::PointLight>() && ImGui::CollapsingHeader("Light"))
+        {
+            auto lightProps = obj.get_ref<Nova::Component::PointLight>();
+
+            ImGui::DragFloat3("Ambient", &(lightProps->base.ambient(0)), 0.005f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Diffuse", &(lightProps->base.diffuse(0)), 0.005f, 0.0f, 1.0f);
+            ImGui::DragFloat3("Specular", &(lightProps->base.specular(0)), 0.005f, 0.0f, 1.0f);
+
+            ImGui::DragFloat("Constant", &(lightProps->constant), 1.0f);
+            ImGui::DragFloat("Linear", &(lightProps->linear), 0.05f);
+            ImGui::DragFloat("Quadratic", &(lightProps->quadratic), 0.01f);
+        }
     }
 
     ImGui::End();
