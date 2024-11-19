@@ -2,9 +2,9 @@
 
 #define SHADER_PATH(filename) ("../../../shaders/" ## filename)
 
-std::vector<flecs::entity> cubes;
+Nova::Array<Nova::Entity> cubes;
 
-Eigen::Vector3f cubePositions[] = {
+Nova::Vector3 cubePositions[] = {
     { 0.0f,  0.0f,  0.0f},
     { 2.0f,  5.0f, -15.0f},
     {-1.5f, -2.2f, -2.5f},
@@ -19,27 +19,27 @@ Eigen::Vector3f cubePositions[] = {
 
 namespace Nova
 {
-    float deltaTime = 0.0f;
-    float lastTime = 0.0f;
+    Nova::Float deltaTime = 0.0f;
+    Nova::Float lastTime = 0.0f;
     
     GLFWwindow* window;
     
-    std::vector<Nova::Texture*> globalTextures;
+    Nova::Array<Nova::Texture*> globalTextures;
     
     Nova::Shader unlitShader;
     Nova::Shader forwardShader;
     Nova::Shader lightSourceShader;
     Nova::Shader activeObjShader;
-    GLuint activeProgram;
+    Nova::ShaderProgram activeProgram;
 
     Nova::Editor::EditorCamera editorCamera;
 
-    flecs::world ecs;
-    flecs::entity activeObj;
-    std::vector<flecs::entity> entities;
+    Nova::World ecs;
+    Nova::Entity activeObj;
+    Nova::Array<Nova::Entity> entities;
 
     //Begins graphics specific setup for items like GLFW, GLAD, ImGUI, etc.
-    int initGraphics(void)
+    Nova::Int initGraphics(void)
     {
         //---------------GLFW---------------//
         //Begin GLFW
@@ -108,7 +108,7 @@ namespace Nova
         return 0;
     }
 
-    int initECS()
+    Nova::Int initECS()
     {
         //TODO: Redo for lights
         //Render system includes transformation information
@@ -123,15 +123,15 @@ namespace Nova
 
         //Create test cubes
         cubes.resize(10);
-        for (int i = 0; i < 10; ++i)
+        for (Nova::Int i = 0; i < 10; ++i)
         {
             Nova::Component::Transform transform;
             transform.position = cubePositions[i];
-            transform.rotation = Eigen::Vector3f(0.8629051f, 0.2558994f, 0.4338701f).normalized() * 20.0f * i; 
+            transform.rotation = Nova::Vector3(0.8629051f, 0.2558994f, 0.4338701f).normalized() * 20.0f * i; 
             //TODO: Rotation about an arbitrary axis is broken
-            transform.scale = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
+            transform.scale = Nova::Vector3(1.0f, 1.0f, 1.0f);
 
-            std::string name = "Cube " + std::to_string(i);
+            Nova::String name = "Cube " + std::to_string(i);
             cubes[i] = Nova::createCube();
             cubes[i].set_doc_name(name.c_str());
             
@@ -148,13 +148,13 @@ namespace Nova
 
         //Add a light source
         Nova::Component::Transform plTransform = Nova::Component::DEFAULT_TRANSFORM;
-        plTransform.position = Eigen::Vector3f(1.2f, 1.0f, 2.0f);
-        plTransform.scale = Eigen::Vector3f(0.2f, 0.2f, 0.2f);
+        plTransform.position = Nova::Vector3(1.2f, 1.0f, 2.0f);
+        plTransform.scale = Nova::Vector3(0.2f, 0.2f, 0.2f);
 
         Nova::BaseLight plBase;
-        plBase.ambient  = Eigen::Vector3f(0.1f, 0.1f, 0.1f);
-        plBase.diffuse  = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
-        plBase.specular = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+        plBase.ambient  = Nova::Vector3(0.1f, 0.1f, 0.1f);
+        plBase.diffuse  = Nova::Vector3(1.0f, 1.0f, 1.0f);
+        plBase.specular = Nova::Vector3(0.0f, 0.0f, 0.0f);
 
         Nova::Component::PointLight plProps;
         plProps.base = plBase;
@@ -174,12 +174,12 @@ namespace Nova
         return 0;
     }
 
-    int mainLoop()
+    Nova::Int mainLoop()
     {
         while(!glfwWindowShouldClose(window))
         {
             //Calculate delta-times
-            float thisFrame = static_cast<float>(glfwGetTime());
+            Nova::Float thisFrame = static_cast<Nova::Float>(glfwGetTime());
             Nova::deltaTime = thisFrame - Nova::lastTime;
             Nova::lastTime  = thisFrame;
 
@@ -213,7 +213,7 @@ namespace Nova
             glfwSwapBuffers(window);
 
             //Framerate lock at 60fps, TESTING ONLY
-            float remaining = static_cast<float>(glfwGetTime()) - Nova::deltaTime;
+            Nova::Float remaining = static_cast<Nova::Float>(glfwGetTime()) - Nova::deltaTime;
             if (remaining < (1.0f / 60.0f))
             {
                 std::this_thread::sleep_for(
@@ -238,7 +238,7 @@ namespace Nova
     }
 }
 
-int main(void)
+Nova::Int main(void)
 {
     Nova::initGraphics();
     

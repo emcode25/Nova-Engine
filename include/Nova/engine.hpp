@@ -2,6 +2,7 @@
 #define ENGINE_HPP
 
 #include <vector>
+#include "types.hpp"
 #include "components.hpp"
 #include "shader.hpp"
 #include "editor_camera.hpp"
@@ -9,22 +10,22 @@
 namespace Nova
 {
     //Records the time passed since the last frame
-    extern float deltaTime;
+    extern Nova::Float deltaTime;
 
     //Records the time up to the last frame, to be used for deltaTime calculations
-    extern float lastTime;
+    extern Nova::Float lastTime;
 
     //The flecs world object that stores all information about every object and component
-    extern flecs::world ecs;
+    extern Nova::World ecs;
 
     //The context to apply graphics processes
     extern GLFWwindow* window;
 
     //Global ID list of all entities
-    extern std::vector<flecs::entity> entities;
+    extern Nova::Array<Nova::Entity> entities;
 
     //Global store for all textures
-    extern std::vector<Nova::Texture*> globalTextures;
+    extern Nova::Array<Nova::Texture*> globalTextures;
 
     //The shader to use without lighting
     extern Nova::Shader unlitShader;
@@ -42,10 +43,10 @@ namespace Nova
     extern Nova::Editor::EditorCamera editorCamera;
 
     //The object to highlight when editing the game
-    extern flecs::entity activeObj;
+    extern Nova::Entity activeObj;
 
     //The shader program to use when rendering
-    extern GLuint activeProgram;
+    extern Nova::ShaderProgram activeProgram;
 }
 
 #endif

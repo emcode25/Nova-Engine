@@ -36,7 +36,7 @@ Nova::Shader::Shader()
 
 //Init is necessary because shader creation needs to be after OpenGL initializes,
 //so initialization must wait until after that occurs.
-int Nova::Shader::init(const char* vertexFilename, const char* fragmentFilename)
+Nova::Int Nova::Shader::init(Nova::String vertexFilename, Nova::String fragmentFilename)
 {
     std::string vertexCode = readFileToString(vertexFilename);
     std::string fragmentCode = readFileToString(fragmentFilename);
@@ -69,7 +69,7 @@ int Nova::Shader::init(const char* vertexFilename, const char* fragmentFilename)
     return 0;
 }
 
-int Nova::Shader::init(const char* vertexFilename, const char* geometryFilename, const char* fragmentFilename)
+Nova::Int Nova::Shader::init(Nova::String vertexFilename, Nova::String geometryFilename, Nova::String fragmentFilename)
 {
     std::string vertexCode = readFileToString(vertexFilename);
     std::string geometryCode = readFileToString(geometryFilename);

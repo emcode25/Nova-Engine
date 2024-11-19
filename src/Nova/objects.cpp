@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include <vector>
+#include <Nova/types.hpp>
 #include <Nova/components.hpp>
 #include <Nova/utils.hpp>
 
@@ -9,7 +11,7 @@
 #include <Nova/nova.hpp>
 #undef NOVA_HPP_NO_HEADERS
 
-constexpr int NUM_CUBE_VERTICES = 17;
+constexpr Nova::UInt NUM_CUBE_VERTICES = 17;
 Nova::Vertex cubeVertices[] = 
 {   //Position              Normals       UVs
     {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}, //0
@@ -30,7 +32,7 @@ Nova::Vertex cubeVertices[] =
     {{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}}  //15
 };
 
-GLuint cubeIndices[] =
+Nova::UInt cubeIndices[] =
 {
     0, 1, 2,
     2, 3, 0,
@@ -46,7 +48,7 @@ GLuint cubeIndices[] =
     11, 15, 3
 };
 
-flecs::entity Nova::createCube()
+Nova::Entity Nova::createCube()
 {
     //Cube texture
     static bool textureAdded = false;
@@ -59,12 +61,12 @@ flecs::entity Nova::createCube()
     }
 
     //Create cube and add basic Transform
-	flecs::entity cube = Nova::ecs.entity();
+	Nova::Entity cube = Nova::ecs.entity();
 	cube.add<Nova::Component::Transform>();
 	cube.set<Nova::Component::Transform>(Nova::Component::DEFAULT_TRANSFORM);
 
     //Load and set mesh for cube
-    GLuint VAO, VBO, EBO;
+    Nova::UInt VAO, VBO, EBO;
     //TODO: only allocate VAO, VBO, and EBO once for all cubes
     Nova::Component::Mesh mesh;
     glGenVertexArrays(1, &VAO);
@@ -73,7 +75,7 @@ flecs::entity Nova::createCube()
 
     //Set mesh properties for use in GL commands
     mesh.vertices = std::vector<Nova::Vertex>(std::begin(cubeVertices), std::end(cubeVertices));
-    mesh.indices  = std::vector<GLuint>(std::begin(cubeIndices), std::end(cubeIndices));
+    mesh.indices  = std::vector<Nova::UInt>(std::begin(cubeIndices), std::end(cubeIndices));
     mesh.textures = std::vector<Nova::Texture*>();
     mesh.textures.push_back(containerTexture);
     mesh.VAO = VAO;
@@ -101,7 +103,7 @@ flecs::entity Nova::createCube()
     glEnableVertexAttribArray(2);
 
     //Set indices
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh.indices.size(), &mesh.indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Nova::UInt) * mesh.indices.size(), &mesh.indices[0], GL_STATIC_DRAW);
 
 	cube.add<Nova::Component::Mesh>();
     cube.set<Nova::Component::Mesh>(mesh);

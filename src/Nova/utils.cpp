@@ -9,10 +9,10 @@
 
 #include <Nova/const.hpp>
 
-std::string Nova::readFileToString(const char* filename)
+Nova::String Nova::readFileToString(Nova::String filename)
 {
-	FILE* file = fopen(filename, "r");
-	std::string contents;
+	FILE* file = fopen(filename.c_str(), "r");
+	Nova::String contents;
 
 	if (file != NULL)
 	{
@@ -29,10 +29,10 @@ std::string Nova::readFileToString(const char* filename)
 
 	std::cerr << "File could not be opened." << std::endl;
 
-	return std::string("Could not read file.");
+	return Nova::String("Could not read file.");
 }
 
-void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, float dt)
+void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, Nova::Float dt)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
@@ -63,7 +63,7 @@ void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, flo
 	}
 }
 
-Nova::Texture* Nova::loadTexture(std::string name, const char* filename, Nova::TexType type, std::vector<Nova::Texture*>& textureSet)
+Nova::Texture* Nova::loadTexture(Nova::String name, Nova::String filename, Nova::TexType type, Nova::Array<Nova::Texture*>& textureSet)
 {
 	for(auto texture : textureSet)
 	{
@@ -89,7 +89,7 @@ Nova::Texture* Nova::loadTexture(std::string name, const char* filename, Nova::T
 
 	//Load textures
 	int width, height, channels;
-	GLubyte* data = stbi_load(filename, &width, &height, &channels, 0);
+	Nova::UByte* data = stbi_load(filename.c_str(), &width, &height, &channels, 0);
 	if (data)
 	{
 		//Choose the right format
@@ -131,7 +131,7 @@ Nova::Texture* Nova::loadTexture(std::string name, const char* filename, Nova::T
 	return tex;
 }
 
-void Nova::deleteTextures(std::vector<Nova::Texture*>& textureSet)
+void Nova::deleteTextures(Nova::Array<Nova::Texture*>& textureSet)
 {
 	for (auto texture : textureSet)
 	{
@@ -139,13 +139,13 @@ void Nova::deleteTextures(std::vector<Nova::Texture*>& textureSet)
 	}
 }
 
-Eigen::Matrix4f Nova::lookAt(const Eigen::Vector3f& position, const Eigen::Vector3f& target, const Eigen::Vector3f& up)
+Nova::Matrix4 Nova::lookAt(const Nova::Vector3& position, const Nova::Vector3& target, const Nova::Vector3& up)
 {
 	//Calculate orthogonal basis for camera and store in matrix
-	Eigen::Matrix4f lookAt;
-	Eigen::Vector3f camDir   = (position - target).normalized();
-	Eigen::Vector3f camRight = up.cross(camDir).normalized();
-	Eigen::Vector3f camUp    = camDir.cross(camRight).normalized();
+	Nova::Matrix4 lookAt;
+	Nova::Vector3 camDir   = (position - target).normalized();
+	Nova::Vector3 camRight = up.cross(camDir).normalized();
+	Nova::Vector3 camUp    = camDir.cross(camRight).normalized();
 
 	lookAt << camRight[0], camRight[1], camRight[2], 0.0f,
 			  camUp[0],    camUp[1],    camUp[2],    0.0f,
@@ -160,13 +160,13 @@ Eigen::Matrix4f Nova::lookAt(const Eigen::Vector3f& position, const Eigen::Vecto
 	return lookAt;
 }
 
-Eigen::Matrix4f Nova::makePerspective(float aspectRatio, float fov, float near, float far)
+Nova::Matrix4 Nova::makePerspective(Nova::Float aspectRatio, Nova::Float fov, Nova::Float near, Nova::Float far)
 {
 	//Create variables to save on repeated computations
-	float inverseCotFov = 1.0f / tanf(fov / 2.0f);
-	float inverseFarNearDiff = 1.0f / (far - near);
+	Nova::Float inverseCotFov = 1.0f / tanf(fov / 2.0f);
+	Nova::Float inverseFarNearDiff = 1.0f / (far - near);
 
-	Eigen::Matrix4f proj;
+	Nova::Matrix4 proj;
 	proj << inverseCotFov / aspectRatio, 0.0f, 0.0f, 0.0f,
 			0.0f, inverseCotFov, 0.0f, 0.0f,
 			0.0f, 0.0f, -(far + near) * inverseFarNearDiff, -(2.0f * far * near) * inverseFarNearDiff,
@@ -176,19 +176,19 @@ Eigen::Matrix4f Nova::makePerspective(float aspectRatio, float fov, float near, 
 }
 
 //x: pitch, y: yaw, z: roll, angles in degrees
-Eigen::Quaternionf Nova::rotateFromEuler(Eigen::Vector3f angles, bool isRadians)
+Nova::Quaternion Nova::rotateFromEuler(Nova::Vector3 angles, bool isRadians)
 {
-	Eigen::Quaternionf rotation;
+	Nova::Quaternion rotation;
 
 	//Convert angles to radians
 	angles *= (isRadians) ? 1 : Nova::CONST::DEG_TO_RAD;
 
-	float cosPitch = cosf(angles.x() * 0.5f);
-	float sinPitch = sinf(angles.x() * 0.5f);
-	float cosYaw   = cosf(angles.y() * 0.5f);
-	float sinYaw   = sinf(angles.y() * 0.5f);
-	float cosRoll  = cosf(angles.z() * 0.5f);
-	float sinRoll  = sinf(angles.z() * 0.5f);
+	Nova::Float cosPitch = cosf(angles.x() * 0.5f);
+	Nova::Float sinPitch = sinf(angles.x() * 0.5f);
+	Nova::Float cosYaw   = cosf(angles.y() * 0.5f);
+	Nova::Float sinYaw   = sinf(angles.y() * 0.5f);
+	Nova::Float cosRoll  = cosf(angles.z() * 0.5f);
+	Nova::Float sinRoll  = sinf(angles.z() * 0.5f);
 
 	rotation.x() = sinPitch * cosYaw * cosRoll - cosPitch * sinYaw * sinRoll;
 	rotation.y() = cosPitch * sinYaw * cosRoll + sinPitch * cosYaw * sinRoll;

@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include <Nova/types.hpp>
 #include <Nova/enums.hpp>
 
 namespace Nova
@@ -10,23 +11,23 @@ namespace Nova
     //Vertex is meant to be used to populate the Mesh component
     struct Vertex
     {
-        Eigen::Vector3f pos;
-        Eigen::Vector3f normal;
-        Eigen::Vector2f uv;
+        Nova::Vector3 pos;
+        Nova::Vector3 normal;
+        Nova::Vector2 uv;
     };
 
     struct Texture
     {
-        unsigned int texture;
-        std::string name;
+        Nova::UInt texture;
+        Nova::String name;
         Nova::TexType type;
     };
 
     struct BaseLight
     {
-        Eigen::Vector3f ambient;
-        Eigen::Vector3f diffuse;
-        Eigen::Vector3f specular;
+        Nova::Vector3 ambient;
+        Nova::Vector3 diffuse;
+        Nova::Vector3 specular;
     };
 }
 

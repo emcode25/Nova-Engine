@@ -1,7 +1,7 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#include <glad/glad.h>
+#include "types.hpp"
 
 namespace Nova
 {
@@ -10,15 +10,15 @@ namespace Nova
 	public:
 		Shader();
 
-		int init(const char* vertexFilename, const char* fragmentFilename);
-		int init(const char* vertexFilename, const char* geometryFilename, const char* fragmentFilename);
+		Nova::Int init(Nova::String vertexFilename, Nova::String fragmentFilename);
+		Nova::Int init(Nova::String vertexFilename, Nova::String geometryFilename, Nova::String fragmentFilename);
 
 		~Shader();
 
-		GLuint getProgram(void);
+		Nova::UInt getProgram(void);
 
 	private:
-		GLuint program;
+		Nova::UInt program;
 	};
 }
 

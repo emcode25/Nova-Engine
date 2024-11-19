@@ -8,6 +8,7 @@
 
 #include <Eigen/Core>
 
+#include <Nova/types.hpp>
 #include <Nova/structs.hpp>
 
 namespace Nova
@@ -16,9 +17,9 @@ namespace Nova
     {
         struct Transform
         {
-            Eigen::Vector3f position;
-            Eigen::Vector3f rotation;
-            Eigen::Vector3f scale;
+            Nova::Vector3 position;
+            Nova::Vector3 rotation;
+            Nova::Vector3 scale;
         };
 
         const Transform DEFAULT_TRANSFORM =
@@ -30,37 +31,37 @@ namespace Nova
 
         struct Mesh
         {
-            std::vector<Vertex>  vertices;
-            std::vector<GLuint>  indices;
-            std::vector<Texture*> textures;
-            GLuint VAO;
-            GLuint VBO;
-            GLuint EBO;
+            Nova::Array<Vertex>  vertices;
+            Nova::Array<UInt>  indices;
+            Nova::Array<Texture*> textures;
+            Nova::UInt VAO;
+            Nova::UInt VBO;
+            Nova::UInt EBO;
         };
 
         struct Camera
         {
-            float fov;
-            float zNear;
-            float zFar;
+            Nova::Float fov;
+            Nova::Float zNear;
+            Nova::Float zFar;
         };
 
         struct DirectionalLight
         {
-            BaseLight base;
-            Eigen::Vector3f direction;
+            Nova::BaseLight base;
+            Nova::Vector3 direction;
         };
 
         struct PointLight
         {
-            BaseLight base;
+            Nova::BaseLight base;
 
-            float constant;
-            float linear;
-            float quadratic;
+            Nova::Float constant;
+            Nova::Float linear;
+            Nova::Float quadratic;
         };
 
-        const Camera DEFAULT_CAMERA = {45.0f, 1.0f, 100.0f};
+        const Camera DEFAULT_CAMERA = { 45.0f, 1.0f, 100.0f };
     }
 }
 

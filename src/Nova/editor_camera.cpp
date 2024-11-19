@@ -21,7 +21,7 @@ Nova::Editor::EditorCamera::EditorCamera()
     updateCameraVectors();
 }
 
-Nova::Editor::EditorCamera::EditorCamera(const Nova::Component::Transform& t, const Nova::Component::Camera& c, const Eigen::Vector3f& up)
+Nova::Editor::EditorCamera::EditorCamera(const Nova::Component::Transform& t, const Nova::Component::Camera& c, const Nova::Vector3& up)
 {
     transform = t;
     cam = c;
@@ -39,9 +39,9 @@ Nova::Component::Camera Nova::Editor::EditorCamera::getCameraProperties()
     return cam;
 }
 
-void Nova::Editor::EditorCamera::updatePosition(const Nova::Editor::EditorCameraMovement& direction, float dt)
+void Nova::Editor::EditorCamera::updatePosition(const Nova::Editor::EditorCameraMovement& direction, Nova::Float dt)
 {
-    float vel = moveSpeed * dt;
+    Nova::Float vel = moveSpeed * dt;
 
     switch(direction)
     {
@@ -62,17 +62,17 @@ void Nova::Editor::EditorCamera::updatePosition(const Nova::Editor::EditorCamera
     }
 }
 
-Eigen::Matrix4f Nova::Editor::EditorCamera::viewMatrix()
+Nova::Matrix4 Nova::Editor::EditorCamera::viewMatrix()
 {
     return Nova::lookAt(transform.position, transform.position + front, up);
 }
 
 void Nova::Editor::EditorCamera::updateCameraVectors()
 {
-    float yaw = Nova::CONST::DEG_TO_RAD * transform.rotation(0);
-    float pitch = Nova::CONST::DEG_TO_RAD * transform.rotation(1);
+    Nova::Float yaw = Nova::CONST::DEG_TO_RAD * transform.rotation(0);
+    Nova::Float pitch = Nova::CONST::DEG_TO_RAD * transform.rotation(1);
 
-    Eigen::Vector3f newFront;
+    Nova::Vector3 newFront;
     newFront(0) = std::cos(yaw) * std::cos(pitch);
     newFront(1) = std::sin(pitch);
     newFront(2) = std::sin(yaw) * std::cos(pitch);
@@ -82,7 +82,7 @@ void Nova::Editor::EditorCamera::updateCameraVectors()
     up = right.cross(front).normalized();
 }
 
-void Nova::Editor::EditorCamera::updateDirection(float xoffset, float yoffset)
+void Nova::Editor::EditorCamera::updateDirection(Nova::Float xoffset, Nova::Float yoffset)
 {
     xoffset *= sensitivity;
     yoffset *= sensitivity;
