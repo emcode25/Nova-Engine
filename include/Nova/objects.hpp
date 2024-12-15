@@ -9,6 +9,7 @@ namespace Nova
 	Nova::Entity createCube();
 	Nova::Entity createCamera();
 	Nova::Entity createLightCube(const Nova::Component::PointLight& props);
+	Nova::Entity createDefaultPointLight();
 }
 
 #endif

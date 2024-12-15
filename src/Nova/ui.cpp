@@ -103,6 +103,20 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
                     objs.push_back(cam);
                 }
 
+                if (ImGui::BeginMenu("Lights"))
+                {
+                    if (ImGui::MenuItem("Point"))
+                    {
+                        auto pl = Nova::createDefaultPointLight();
+                        pl.set_doc_name("PLight");
+
+                        Nova::lightManager.addPointLight(pl);
+                        objs.push_back(pl);
+                    }
+
+                    ImGui::EndMenu();
+                }
+
                 ImGui::EndMenu();
             }
 

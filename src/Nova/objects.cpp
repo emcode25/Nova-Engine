@@ -200,3 +200,20 @@ flecs::entity Nova::createLightCube(const Nova::Component::PointLight& props)
 
     return cubeLight;
 }
+
+flecs::entity Nova::createDefaultPointLight()
+{
+    //Add a light source
+    Nova::BaseLight plBase;
+    plBase.ambient = Nova::Vector3(0.1f, 0.1f, 0.1f);
+    plBase.diffuse = Nova::Vector3(1.0f, 1.0f, 1.0f);
+    plBase.specular = Nova::Vector3(0.0f, 0.0f, 0.0f);
+
+    Nova::Component::PointLight plProps;
+    plProps.base = plBase;
+    plProps.constant = 1.0f;
+    plProps.linear = 0.09f;
+    plProps.quadratic = 0.032f;
+
+    return Nova::createLightCube(plProps);
+}
