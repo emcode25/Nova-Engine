@@ -12,7 +12,7 @@
 #include <imgui/imgui.h>
 #include <nfd.h>
 
-void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::vector<flecs::entity>& objs)
+void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, Nova::Array<flecs::entity>& objs)
 {
     static bool texWindowOpen = false;
     bool quit = false;
@@ -193,7 +193,7 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
 
 //Displays the combo tool for texture selection
 //Returns true when a selection has occurred, indexSelected will reflect what was selected
-bool textureNameCombo(int& indexSelected, std::vector<Nova::Texture*>& textureSet)
+bool textureNameCombo(int& indexSelected, Nova::Array<Nova::Texture*>& textureSet)
 {
     if (indexSelected < 0 || indexSelected > textureSet.size())
     {
@@ -226,7 +226,7 @@ bool textureNameCombo(int& indexSelected, std::vector<Nova::Texture*>& textureSe
 }
 
 //Returns the index if a texture is found, -1 otherwise
-int findTextureIndex(Nova::Texture* texture, std::vector<Nova::Texture*>& textureSet)
+int findTextureIndex(Nova::Texture* texture, Nova::Array<Nova::Texture*>& textureSet)
 {
     for (int i = 0; i < textureSet.size(); ++i)
     {
@@ -306,7 +306,7 @@ void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)
     prevObj = obj;
 }
 
-void Nova::EditorUI::ShowObjectList(std::vector<flecs::entity>& objs, flecs::entity& activeObj)
+void Nova::EditorUI::ShowObjectList(Nova::Array<flecs::entity>& objs, flecs::entity& activeObj)
 {
     ImGui::Begin("Object List", NULL, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar);
     

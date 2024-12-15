@@ -119,7 +119,6 @@ namespace Nova
 
     Nova::Int initECS()
     {
-        //TODO: Redo for lights
         //Render system includes transformation information
         Nova::ecs.system<const Nova::Component::Transform, const Nova::Component::Mesh, const Nova::Component::PointLight>("Point Light Render")
             .run(PointLightRenderSystem);
