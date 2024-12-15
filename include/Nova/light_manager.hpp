@@ -1,7 +1,6 @@
 #ifndef LIGHT_MANAGER_HPP
 #define LIGHT_MANAGER_HPP
 
-#include <glad/glad.h>
 #include <vector>
 #include <Nova/components.hpp>
 #include <flecs.h>
@@ -24,6 +23,8 @@ namespace Nova
 			void removePointLight(Nova::String name);
 			void removePointLight(Nova::Entity e);
 
+			void reloadPointLight(Nova::Entity e);
+
 			Nova::UInt getPointLightCount();
 
 		private:
@@ -31,8 +32,8 @@ namespace Nova
 
 			Nova::Array<Nova::ShaderProgram> programs;
 			Nova::Array<Nova::Entity> pointLights;
-		}
+		};
 	}
-};
+}
 
 #endif

@@ -67,6 +67,11 @@ Nova::Matrix4 Nova::Editor::EditorCamera::viewMatrix()
     return Nova::lookAt(transform.position, transform.position + front, up);
 }
 
+Nova::Vector3 Nova::Editor::EditorCamera::getPosition()
+{
+    return transform.position;
+}
+
 void Nova::Editor::EditorCamera::updateCameraVectors()
 {
     Nova::Float yaw = Nova::CONST::DEG_TO_RAD * transform.rotation(0);

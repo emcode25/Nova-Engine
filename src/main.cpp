@@ -37,6 +37,7 @@ namespace Nova
     Nova::World ecs;
     Nova::Entity activeObj;
     Nova::Array<Nova::Entity> entities;
+    Nova::Lighting::LightManager lightManager;
 
     //Begins graphics specific setup for items like GLFW, GLAD, ImGUI, etc.
     Nova::Int initGraphics(void)
@@ -103,6 +104,8 @@ namespace Nova
         lightSourceShader.init(SHADER_PATH("lights/vertex.vert"), SHADER_PATH("lights/fragment.frag"));
         activeObjShader.init(SHADER_PATH("active/vertex.vert"), SHADER_PATH("active/geometry.geom"), SHADER_PATH("active/fragment.frag"));
 
+        lightManager.addProgram(forwardShader.getProgram());
+
         stbi_set_flip_vertically_on_load(true);
         
         return 0;
@@ -166,7 +169,9 @@ namespace Nova
         pointLight.set<Nova::Component::Transform>(plTransform);
         pointLight.set_doc_name("Light 0");
         entities.push_back(pointLight);
-        
+        lightManager.addPointLight(pointLight);
+        //TODO: Gather all point lights on game startup
+        //TODO: See if flecs can do some kind of component initialization
 
         activeObj = cam;
         activeProgram = forwardShader.getProgram();

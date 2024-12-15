@@ -36,8 +36,12 @@ void Nova::ObjectRenderSystem(flecs::iter& it)
     Nova::UInt viewLoc = glGetUniformLocation(activeProgram, "view");
     Nova::UInt projLoc = glGetUniformLocation(activeProgram, "proj");
 
+    Nova::UInt viewPosLoc = glGetUniformLocation(activeProgram, "viewPos");
+
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data());
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, proj.data());
+
+    glUniform3fv(viewPosLoc, 1, editorCamera.getPosition().data());
 
     while (it.next())
     {
@@ -99,6 +103,12 @@ void Nova::ObjectRenderSystem(flecs::iter& it)
         auto activeMesh = activeObj.get_ref<Nova::Component::Mesh>();
         glBindVertexArray(activeMesh->VAO);
         glDrawElements(GL_TRIANGLES, activeMesh->indices.size(), GL_UNSIGNED_INT, 0);
+    }
+
+    //Allow light values to change if the object is active
+    if (activeObj.has<Nova::Component::PointLight>())
+    {
+        lightManager.reloadPointLight(activeObj);
     }
 }
 

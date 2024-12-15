@@ -34,6 +34,8 @@ namespace Nova
 
             Nova::Matrix4 viewMatrix();
 
+            Nova::Vector3 getPosition();
+
         private:
             Nova::Component::Transform transform;
             Nova::Component::Camera cam;

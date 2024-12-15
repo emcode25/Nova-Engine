@@ -6,6 +6,7 @@
 #include "components.hpp"
 #include "shader.hpp"
 #include "editor_camera.hpp"
+#include "light_manager.hpp"
 
 namespace Nova
 {
@@ -47,6 +48,9 @@ namespace Nova
 
     //The shader program to use when rendering
     extern Nova::ShaderProgram activeProgram;
+
+    //The lighting manager in charge of all light sources
+    extern Nova::Lighting::LightManager lightManager;
 }
 
 #endif
