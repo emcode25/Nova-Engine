@@ -17,19 +17,19 @@ namespace Nova
 
 			bool addProgram(Nova::ShaderProgram program);
 			void removeProgram(Nova::ShaderProgram program);
+			void clearPrograms();
 
 			bool addPointLight(Nova::Entity e);
 			bool addPointLight(Nova::Component::PointLight pl);
 			void removePointLight(Nova::String name);
 			void removePointLight(Nova::Entity e);
 
-			void reloadPointLight(Nova::Entity e);
+			void loadPointLight(Nova::Entity e);
+			void loadPointLights();
 
 			Nova::UInt getPointLightCount();
 
 		private:
-			void loadPointLights();
-
 			Nova::Array<Nova::ShaderProgram> programs;
 			Nova::Array<Nova::Entity> pointLights;
 		};

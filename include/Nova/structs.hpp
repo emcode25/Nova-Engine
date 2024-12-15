@@ -29,6 +29,13 @@ namespace Nova
         Nova::Vector3 diffuse;
         Nova::Vector3 specular;
     };
+
+    struct ShaderInfo
+    {
+        Nova::String vertexPath;
+        Nova::String geometryPath;
+        Nova::String fragmentPath;
+    };
 }
 
 #endif

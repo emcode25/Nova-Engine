@@ -108,7 +108,7 @@ void Nova::ObjectRenderSystem(flecs::iter& it)
     //Allow light values to change if the object is active
     if (activeObj.has<Nova::Component::PointLight>())
     {
-        lightManager.reloadPointLight(activeObj);
+        lightManager.loadPointLight(activeObj);
     }
 }
 

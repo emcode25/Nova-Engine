@@ -44,7 +44,26 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("View"))
+        if (ImGui::BeginMenu("Tools"))
+        {
+            if (ImGui::MenuItem("Recompile Shaders"))
+            {
+                Nova::shaderManager.recompileShaders();
+                Nova::lightManager.clearPrograms();
+
+                for (auto program : Nova::shaderManager.getShaderPrograms())
+                {
+                    lightManager.addProgram(program);
+                }
+
+                Nova::lightManager.loadPointLights();
+                Nova::activeProgram = Nova::forwardShader.getProgram();
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Views"))
         {
             if (ImGui::BeginMenu("Lighting Mode"))
             {
@@ -64,7 +83,7 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, std::
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Object"))
+        if (ImGui::BeginMenu("Objects"))
         {
             if (ImGui::BeginMenu("New Object"))
             {

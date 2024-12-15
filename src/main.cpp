@@ -38,6 +38,7 @@ namespace Nova
     Nova::Entity activeObj;
     Nova::Array<Nova::Entity> entities;
     Nova::Lighting::LightManager lightManager;
+    Nova::ShaderManager shaderManager;
 
     //Begins graphics specific setup for items like GLFW, GLAD, ImGUI, etc.
     Nova::Int initGraphics(void)
@@ -103,6 +104,11 @@ namespace Nova
         forwardShader.init(SHADER_PATH("vertex.vert"), SHADER_PATH("forward.frag"));
         lightSourceShader.init(SHADER_PATH("lights/vertex.vert"), SHADER_PATH("lights/fragment.frag"));
         activeObjShader.init(SHADER_PATH("active/vertex.vert"), SHADER_PATH("active/geometry.geom"), SHADER_PATH("active/fragment.frag"));
+
+        shaderManager.addShader(unlitShader);
+        shaderManager.addShader(forwardShader);
+        shaderManager.addShader(lightSourceShader);
+        shaderManager.addShader(activeObjShader);
 
         lightManager.addProgram(forwardShader.getProgram());
 

@@ -20,6 +20,11 @@ void Nova::Lighting::LightManager::removeProgram(Nova::ShaderProgram program)
 {
 }
 
+void Nova::Lighting::LightManager::clearPrograms()
+{
+	programs.clear();
+}
+
 bool Nova::Lighting::LightManager::addPointLight(Nova::Entity e)
 {
 	if (!e.has<Nova::Component::PointLight>())
@@ -48,7 +53,7 @@ void Nova::Lighting::LightManager::removePointLight(Nova::Entity e)
 {
 }
 
-void Nova::Lighting::LightManager::reloadPointLight(Nova::Entity e)
+void Nova::Lighting::LightManager::loadPointLight(Nova::Entity e)
 {
 	//Get the index of the point light in the array, and the point light info
 	auto i = std::distance(pointLights.begin(), std::find(pointLights.begin(), pointLights.end(), e));

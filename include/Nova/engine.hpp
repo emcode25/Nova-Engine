@@ -51,6 +51,9 @@ namespace Nova
 
     //The lighting manager in charge of all light sources
     extern Nova::Lighting::LightManager lightManager;
+
+    //The shader manager to handle recompiles
+    extern Nova::ShaderManager shaderManager;
 }
 
 #endif
