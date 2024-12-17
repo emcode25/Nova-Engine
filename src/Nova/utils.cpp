@@ -10,6 +10,7 @@
 #include <json/json.h>
 
 #include <Nova/const.hpp>
+#include <Nova/engine.hpp>
 
 Nova::String Nova::readFileToString(Nova::String filename)
 {
@@ -207,13 +208,37 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 	Json::Value root;
 	Json::Value data;
 
-	root["hello"] = "world";
-	data["num"] = 10;
-	root["data"] = data;
+	for (const auto& e : Nova::entities)
+	{
+		Json::Value obj;
+		
+		if (e.has<Nova::Component::Transform>())
+		{
+			const auto transform = e.get<Nova::Component::Transform>();
+			const auto pos = transform->position.data();
+			const auto rot = transform->rotation.data();
+			const auto scale = transform->scale.data();
+
+			obj["position"][0] = pos[0];
+			obj["position"][1] = pos[1];
+			obj["position"][2] = pos[2];
+
+			obj["rotation"][0] = rot[0];
+			obj["rotation"][1] = rot[1];
+			obj["rotation"][2] = rot[2];
+
+			obj["scale"][0] = scale[0];
+			obj["scale"][1] = scale[1];
+			obj["scale"][2] = scale[2];
+		}
+
+		obj["name"] = e.doc_name();
+		root[std::to_string(e.id())] = obj;
+	}
 
 	Json::StreamWriterBuilder builder;
 	const std::string jsonFile = Json::writeString(builder, root);
-	
+
 	std::ofstream file(filepath);
 	file << jsonFile;
 
