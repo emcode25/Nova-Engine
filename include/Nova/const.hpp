@@ -17,7 +17,8 @@ namespace Nova
         constexpr Nova::Float DEG_TO_RAD = 3.1415927f / 180.0f;
         constexpr Nova::Float RAD_TO_DEG = 180.0f / 3.1415927f;
 
-        constexpr Nova::Int OBJECT_NAME_CHARACTER_LIMIT = 256;
+        constexpr Nova::UInt OBJECT_NAME_CHARACTER_LIMIT = 256;
+        constexpr Nova::UInt FILE_PATH_CHARACTER_LIMIT = 1024;
 
         constexpr Nova::Int MAX_POINT_LIGHTS = 10;
         constexpr Nova::Int MAX_SPOT_LIGHTS = 3;

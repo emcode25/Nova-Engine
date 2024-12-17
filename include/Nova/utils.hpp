@@ -27,6 +27,8 @@ namespace Nova
 
     //This function assumes angles are in degrees, second parameter should be true if already in radians
     Nova::Quaternion rotateFromEuler(Nova::Vector3 angles, bool isRadians = false);
+
+    Nova::Int saveScene(const Nova::String& filepath);
 }
 
 #endif

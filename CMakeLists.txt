@@ -76,7 +76,8 @@ endif()
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
   find_library(GLFW3 glfw3 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
   find_library(NFD nfd PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-  set(LIBS ${GLFW3} ${NFD} opengl32 comctl32)
+  find_library(JSONCPP jsoncpp PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+  set(LIBS ${GLFW3} ${NFD} ${JSONCPP} opengl32 comctl32)
 endif()
 
 # Find directories and libraries

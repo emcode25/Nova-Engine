@@ -23,7 +23,20 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, Nova:
         {
             //TODO: Implement a save system
             ImGui::MenuItem("Save",  "Ctrl-S");
-            ImGui::MenuItem("Save as...", "Ctrl-Shift-S");
+            
+            if (ImGui::MenuItem("Save as...", "Ctrl-Shift-S"))
+            {
+                //Open file dialog
+                char* path = NULL;
+                nfdresult_t res = NFD_SaveDialog("json", NULL, &path);
+
+                if (res == NFD_OKAY)
+                {
+                    Nova::saveScene(Nova::String(path) + ".json");
+                }
+
+                free(path);
+            }
 
             ImGui::Separator();
             if (ImGui::MenuItem("Quit", "Alt-F4", &quit))

@@ -4,8 +4,10 @@
 #include <string>
 #include <iostream>
 #include <stdio.h>
+#include <fstream>
 
 #include <stb_image.h>
+#include <json/json.h>
 
 #include <Nova/const.hpp>
 
@@ -196,4 +198,26 @@ Nova::Quaternion Nova::rotateFromEuler(Nova::Vector3 angles, bool isRadians)
 	rotation.w() = cosPitch * cosYaw * cosRoll + sinPitch * sinYaw * sinRoll;
 
 	return rotation.normalized();
+}
+
+Nova::Int Nova::saveScene(const Nova::String& filepath)
+{
+	std::cout << "Saving scene to file: " << filepath << std::endl;
+
+	Json::Value root;
+	Json::Value data;
+
+	root["hello"] = "world";
+	data["num"] = 10;
+	root["data"] = data;
+
+	Json::StreamWriterBuilder builder;
+	const std::string jsonFile = Json::writeString(builder, root);
+	
+	std::ofstream file(filepath);
+	file << jsonFile;
+
+	std::cout << "Saved!" << std::endl;
+
+	return Nova::Int();
 }
