@@ -230,28 +230,61 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 	for (const auto& e : Nova::entities)
 	{
 		Json::Value obj;
+		obj["name"] = e.doc_name();
 		
 		if (e.has<Nova::Component::Transform>())
 		{
+			Json::Value t;
+
 			const auto transform = e.get<Nova::Component::Transform>();
 			const auto pos = transform->position.data();
 			const auto rot = transform->rotation.data();
 			const auto scale = transform->scale.data();
 
-			obj["position"][0] = pos[0];
-			obj["position"][1] = pos[1];
-			obj["position"][2] = pos[2];
+			t["position"][0] = pos[0];
+			t["position"][1] = pos[1];
+			t["position"][2] = pos[2];
 
-			obj["rotation"][0] = rot[0];
-			obj["rotation"][1] = rot[1];
-			obj["rotation"][2] = rot[2];
+			t["rotation"][0] = rot[0];
+			t["rotation"][1] = rot[1];
+			t["rotation"][2] = rot[2];
 
-			obj["scale"][0] = scale[0];
-			obj["scale"][1] = scale[1];
-			obj["scale"][2] = scale[2];
+			t["scale"][0] = scale[0];
+			t["scale"][1] = scale[1];
+			t["scale"][2] = scale[2];
+
+			obj["transform"] = t;
 		}
 
-		obj["name"] = e.doc_name();
+		if (e.has<Nova::Component::Mesh>())
+		{
+			Json::Value m;
+			Json::Value mi;
+			Json::Value ts;
+
+			const auto mesh = e.get<Nova::Component::Mesh>();
+			const auto meshInfo = mesh->meshInfo;
+			const auto textures = mesh->textures;
+			
+			mi["path"] = meshInfo.filepath;
+			mi["name"] = meshInfo.name;
+			m["info"] = mi;
+
+			for (int i = 0; i < textures.size(); ++i)
+			{
+				Json::Value tex;
+
+				tex["path"] = textures[i]->path;
+				tex["name"] = textures[i]->name;
+				tex["type"] = textures[i]->type;
+
+				ts[std::to_string(i)].append(tex);
+			}
+
+			m["textures"] = ts;
+			obj["mesh"] = m;
+		}
+
 		root[std::to_string(e.id())] = obj;
 	}
 

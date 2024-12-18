@@ -22,12 +22,14 @@ namespace Nova
         Nova::UInt VAO;
         Nova::UInt indexCount;
         Nova::String name;
+        Nova::String filepath;
     };
 
     struct TextureInfo
     {
         Nova::UInt texture;
         Nova::String name;
+        Nova::String path;
         Nova::TexType type;
     };
 
