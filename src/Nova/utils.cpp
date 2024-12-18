@@ -11,6 +11,7 @@
 
 #include <Nova/const.hpp>
 #include <Nova/engine.hpp>
+#include <Nova/objects.hpp>
 
 Nova::String Nova::readFileToString(Nova::String filename)
 {
@@ -33,6 +34,20 @@ Nova::String Nova::readFileToString(Nova::String filename)
 	std::cerr << "File could not be opened." << std::endl;
 
 	return Nova::String("Could not read file.");
+}
+
+Nova::TextureInfo* Nova::findTexture(const Nova::String& name, const Nova::Array<Nova::TextureInfo*>& textures)
+{
+	for (auto& texture : textures)
+	{
+		if (texture->name == name)
+		{
+			return texture;
+		}
+	}
+
+	std::cerr << "WARNING: Could not find texture name: " << name << std::endl;
+	return NULL;
 }
 
 Nova::MeshInfo Nova::findMesh(const Nova::String& name, const Nova::Array<MeshInfo>& meshes)
@@ -398,6 +413,7 @@ Nova::Int Nova::loadScene(const Nova::String& filepath)
 
 	//Properly load everything back into the scene
 	std::cout << root["meshes"][0]["name"] << std::endl;
+	loadCubeMesh();
 
 	return 0;
 }
@@ -407,8 +423,13 @@ void Nova::clearScene()
 	deleteTextures(Nova::globalTextures);
 	deleteMeshes(Nova::globalMeshes);
 
+	Nova::lightManager.deleteLights();
+
 	for (auto entity : Nova::entities)
 	{
 		entity.destruct();
 	}
+
+	Nova::entities.clear();
+	Nova::entities.shrink_to_fit();
 }

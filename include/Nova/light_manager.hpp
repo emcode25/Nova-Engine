@@ -26,6 +26,7 @@ namespace Nova
 
 			void loadPointLight(Nova::Entity e);
 			void loadPointLights();
+			void deleteLights();
 
 			Nova::UInt getPointLightCount();
 

@@ -110,3 +110,10 @@ void Nova::Lighting::LightManager::loadPointLights()
 		glProgramUniform1i(program, glGetUniformLocation(program, "nPointLights"), pointLights.size());
 	}
 }
+
+void Nova::Lighting::LightManager::deleteLights()
+{
+	pointLights.clear();
+	pointLights.shrink_to_fit();
+	loadPointLights();
+}

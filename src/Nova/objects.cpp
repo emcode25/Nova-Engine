@@ -120,13 +120,14 @@ Nova::MeshInfo Nova::loadCubeMesh()
 
 Nova::Entity Nova::createCube()
 {
+    //TODO: Remove this code eventually
     //Cube texture
     static bool textureAdded = false;
     static Nova::TextureInfo* containerTexture;
 
     if (!textureAdded)
     {
-        containerTexture = Nova::loadTexture("Cube", "../../../data/textures/container.jpg", Nova::TexType::DIFFUSE, globalTextures);
+        containerTexture = Nova::loadTexture("Container", "../../../data/textures/container.jpg", Nova::TexType::DIFFUSE, globalTextures);
         textureAdded = true;
     }
 
@@ -138,8 +139,13 @@ Nova::Entity Nova::createCube()
     //Get mesh for cube
     Nova::Component::Mesh mesh;
     mesh.textures = std::vector<Nova::TextureInfo*>();
-    mesh.textures.push_back(containerTexture);
     mesh.meshInfo = findMesh("Cube Mesh", Nova::globalMeshes);
+
+    TextureInfo* tex = findTexture("Container", Nova::globalTextures);
+    if (tex)
+    {
+        mesh.textures.push_back(tex);
+    }
 
 	cube.add<Nova::Component::Mesh>();
     cube.set<Nova::Component::Mesh>(mesh);

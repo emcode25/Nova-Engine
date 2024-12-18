@@ -23,6 +23,7 @@ namespace Nova
     void deleteMeshes(Nova::Array<Nova::MeshInfo>& meshes);
 
     Nova::TextureInfo* loadTexture(Nova::String name, Nova::String filename, Nova::TexType type, Nova::Array<Nova::TextureInfo*>& textureSet);
+    Nova::TextureInfo* findTexture(const Nova::String& name, const Nova::Array<TextureInfo*>& textureSet);
     void deleteTextures(Nova::Array<Nova::TextureInfo*>& textureSet);
 
     Nova::Matrix4 lookAt(const Nova::Vector3& position, const Nova::Vector3& target, const Nova::Vector3& up = {0.0f, 1.0f, 0.0f});

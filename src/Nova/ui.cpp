@@ -271,7 +271,7 @@ void Nova::EditorUI::ShowObjectProperties(Nova::Entity& obj)
     static auto prevObj = obj;
     bool newObj = (prevObj != obj) ? true : false;
 
-    if(ImGui::Begin("Object Components"))
+    if(ImGui::Begin("Object Components") && obj.is_valid())
     {
         auto activeTransform = obj.get_ref<Nova::Component::Transform>();
         
@@ -294,6 +294,7 @@ void Nova::EditorUI::ShowObjectProperties(Nova::Entity& obj)
         if(obj.has<Nova::Component::Mesh>() && ImGui::CollapsingHeader("Mesh"))
         {
             auto meshProps = obj.get_ref<Nova::Component::Mesh>();
+            auto meshData = meshProps.get();
             static std::vector<int> indexSelected(Nova::CONST::OPENGL_SHADER_TEXTURE_MAX);
 
             for (int i = 0; i < meshProps->textures.size(); ++i)
@@ -342,7 +343,7 @@ void Nova::EditorUI::ShowObjectList(Nova::Array<Nova::Entity>& objs, Nova::Entit
     {
         for (auto e : objs)
         {
-            const bool selected = (activeObj == e);
+            const bool selected = (activeObj.is_valid() && activeObj == e);
             name = e.doc_name();
             name += "##";
             name += e.raw_id();

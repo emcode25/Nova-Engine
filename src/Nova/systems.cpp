@@ -76,6 +76,11 @@ void Nova::ObjectRenderSystem(flecs::iter& it)
         }
     }
 
+    if (!activeObj.is_valid())
+    {
+        return;
+    }
+
     //Active object gets another pass to run the geometry shader
     if (activeObj.has<Nova::Component::Mesh>())
     {
