@@ -20,6 +20,8 @@ namespace Nova
     struct MeshInfo
     {
         Nova::UInt VAO;
+        Nova::UInt VBO;
+        Nova::UInt EBO;
         Nova::UInt indexCount;
         Nova::String name;
         Nova::String filepath;

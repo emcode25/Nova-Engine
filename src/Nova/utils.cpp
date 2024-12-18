@@ -54,6 +54,19 @@ Nova::MeshInfo Nova::findMesh(const Nova::String& name, const Nova::Array<MeshIn
 	return invalidMesh;
 }
 
+void Nova::deleteMeshes(Nova::Array<Nova::MeshInfo>& meshes)
+{
+	for (auto mesh : meshes)
+	{
+		glDeleteVertexArrays(1, &mesh.VAO);
+		glDeleteBuffers(1, &mesh.VBO);
+		glDeleteBuffers(1, &mesh.VBO);
+	}
+
+	meshes.clear();
+	meshes.shrink_to_fit();
+}
+
 void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, Nova::Float dt)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -158,8 +171,13 @@ void Nova::deleteTextures(Nova::Array<Nova::TextureInfo*>& textureSet)
 {
 	for (auto texture : textureSet)
 	{
+		glDeleteTextures(1,	&texture->texture);
+
 		delete texture;
 	}
+
+	textureSet.clear();
+	textureSet.shrink_to_fit();
 }
 
 Nova::Matrix4 Nova::lookAt(const Nova::Vector3& position, const Nova::Vector3& target, const Nova::Vector3& up)
@@ -226,6 +244,7 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 	std::cout << "Saving scene to file: " << filepath << std::endl;
 
 	Json::Value root;
+	Json::Value entities;
 
 	//Save all the meshes used
 	Json::Value meshes;
@@ -237,7 +256,7 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 		m["name"] = mesh.name;
 		m["path"] = mesh.filepath;
 
-		meshes[std::to_string(i)] = m;
+		meshes.append(m);
 	}
 	root["meshes"] = meshes;
 
@@ -252,7 +271,7 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 		t["path"] = tex->path;
 		t["type"] = tex->type;
 
-		textures[std::to_string(i)] = t;
+		textures.append(t);
 	}
 	root["textures"] = textures;
 
@@ -293,8 +312,8 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 			Json::Value ts;
 
 			const auto mesh = e.get<Nova::Component::Mesh>();
-			const auto meshInfo = mesh->meshInfo;
-			const auto textures = mesh->textures;
+			const auto& meshInfo = mesh->meshInfo;
+			const auto& textures = mesh->textures;
 			
 			//Only the name is needed for lookup later for both mesh and textures
 			m["name"] = meshInfo.name;
@@ -305,7 +324,7 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 
 				tex["name"] = textures[i]->name;
 
-				ts[std::to_string(i)].append(tex);
+				ts.append(tex);
 			}
 
 			m["textures"] = ts;
@@ -319,7 +338,7 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 			Json::Value b;
 
 			const auto pointLight = e.get<Nova::Component::PointLight>();
-			const auto base = pointLight->base;
+			const auto& base = pointLight->base;
 			const auto quadratic = pointLight->quadratic;
 			const auto linear = pointLight->linear;
 			const auto constant = pointLight->constant;
@@ -347,9 +366,10 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 		}
 
 		//Use the unique ID to ensure that nothing is overwritten
-		root[std::to_string(e.id())] = obj;
+		entities.append(obj);
 	}
-
+	root["entities"].append(entities);
+	
 	Json::StreamWriterBuilder builder;
 	const std::string jsonFile = Json::writeString(builder, root);
 
@@ -358,5 +378,37 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 
 	std::cout << "Saved!" << std::endl;
 
-	return Nova::Int();
+	return 0;
+}
+
+Nova::Int Nova::loadScene(const Nova::String& filepath)
+{
+	Nova::String jsonData = readFileToString(filepath);
+	JSONCPP_STRING err;
+	Json::Value root;
+	
+	Json::CharReaderBuilder builder;
+	const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+	if (!reader->parse(jsonData.c_str(), jsonData.c_str() + jsonData.length(), &root, &err)) {
+		std::cout << "ERROR: " << err << std::endl;
+		return -1;
+	}
+
+	clearScene();
+
+	//Properly load everything back into the scene
+	std::cout << root["meshes"][0]["name"] << std::endl;
+
+	return 0;
+}
+
+void Nova::clearScene()
+{
+	deleteTextures(Nova::globalTextures);
+	deleteMeshes(Nova::globalMeshes);
+
+	for (auto entity : Nova::entities)
+	{
+		entity.destruct();
+	}
 }

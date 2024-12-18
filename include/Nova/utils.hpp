@@ -20,6 +20,7 @@ namespace Nova
     Nova::String readFileToString(Nova::String filename);
 
     Nova::MeshInfo findMesh(const Nova::String& name, const Nova::Array<MeshInfo>& meshes);
+    void deleteMeshes(Nova::Array<Nova::MeshInfo>& meshes);
 
     Nova::TextureInfo* loadTexture(Nova::String name, Nova::String filename, Nova::TexType type, Nova::Array<Nova::TextureInfo*>& textureSet);
     void deleteTextures(Nova::Array<Nova::TextureInfo*>& textureSet);
@@ -31,6 +32,8 @@ namespace Nova
     Nova::Quaternion rotateFromEuler(Nova::Vector3 angles, bool isRadians = false);
 
     Nova::Int saveScene(const Nova::String& filepath);
+    Nova::Int loadScene(const Nova::String& filepath);
+    void clearScene();
 }
 
 #endif

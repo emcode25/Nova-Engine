@@ -21,7 +21,21 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, Nova:
     {
         if (ImGui::BeginMenu("File"))
         {
-            //TODO: Implement a save system
+            if (ImGui::MenuItem("Open..."))
+            {
+                //Open file dialog
+                char* path = NULL;
+                nfdresult_t res = NFD_OpenDialog("json", NULL, &path);
+
+                if (res == NFD_OKAY)
+                {
+                    loadScene(path);
+                }
+
+                free(path);
+            }
+
+            ImGui::Separator();
             ImGui::MenuItem("Save",  "Ctrl-S");
             
             if (ImGui::MenuItem("Save as...", "Ctrl-Shift-S"))
@@ -252,7 +266,7 @@ int findTextureIndex(Nova::TextureInfo* texture, Nova::Array<Nova::TextureInfo*>
     return -1;
 }
 
-void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)
+void Nova::EditorUI::ShowObjectProperties(Nova::Entity& obj)
 {
     static auto prevObj = obj;
     bool newObj = (prevObj != obj) ? true : false;
@@ -319,7 +333,7 @@ void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)
     prevObj = obj;
 }
 
-void Nova::EditorUI::ShowObjectList(Nova::Array<flecs::entity>& objs, flecs::entity& activeObj)
+void Nova::EditorUI::ShowObjectList(Nova::Array<Nova::Entity>& objs, Nova::Entity& activeObj)
 {
     ImGui::Begin("Object List", NULL, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar);
     

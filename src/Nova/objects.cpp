@@ -86,6 +86,8 @@ Nova::MeshInfo Nova::loadCubeMesh()
 
     //Set mesh properties for use in GL commands
     meshInfo.VAO = VAO;
+    meshInfo.VBO = VBO;
+    meshInfo.EBO = EBO;
     meshInfo.indexCount = 36; //Size of constant array
     meshInfo.name = "Cube Mesh";
     globalMeshes.push_back(meshInfo);
