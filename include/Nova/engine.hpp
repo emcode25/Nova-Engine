@@ -26,7 +26,10 @@ namespace Nova
     extern Nova::Array<Nova::Entity> entities;
 
     //Global store for all textures
-    extern Nova::Array<Nova::Texture*> globalTextures;
+    extern Nova::Array<Nova::TextureInfo*> globalTextures;
+
+    //Global store for all meshes
+    extern Nova::Array<Nova::MeshInfo> globalMeshes;
 
     //The shader to use without lighting
     extern Nova::Shader unlitShader;

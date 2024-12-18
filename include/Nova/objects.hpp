@@ -6,6 +6,8 @@
 
 namespace Nova
 {
+	Nova::MeshInfo loadCubeMesh();
+
 	Nova::Entity createCube();
 	Nova::Entity createCamera();
 	Nova::Entity createLightCube(const Nova::Component::PointLight& props);

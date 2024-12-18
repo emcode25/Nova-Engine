@@ -24,7 +24,8 @@ namespace Nova
     
     GLFWwindow* window;
     
-    Nova::Array<Nova::Texture*> globalTextures;
+    Nova::Array<Nova::TextureInfo*> globalTextures;
+    Nova::Array<Nova::MeshInfo> globalMeshes;
     
     Nova::Shader unlitShader;
     Nova::Shader forwardShader;
@@ -128,6 +129,9 @@ namespace Nova
             .without<Nova::Component::PointLight>()
             .without<Nova::Component::DirectionalLight>() //TODO: Add more lighting types as needed
             .run(ObjectRenderSystem);
+
+        //Load meshes
+        loadCubeMesh();
 
         //Create test cubes
         cubes.resize(10);

@@ -19,8 +19,10 @@ namespace Nova
     void processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, Nova::Float dt);
     Nova::String readFileToString(Nova::String filename);
 
-    Nova::Texture* loadTexture(Nova::String name, Nova::String filename, Nova::TexType type, Nova::Array<Nova::Texture*>& textureSet);
-    void deleteTextures(Nova::Array<Nova::Texture*>& textureSet);
+    Nova::MeshInfo findMesh(const Nova::String& name, const Nova::Array<MeshInfo>& meshes);
+
+    Nova::TextureInfo* loadTexture(Nova::String name, Nova::String filename, Nova::TexType type, Nova::Array<Nova::TextureInfo*>& textureSet);
+    void deleteTextures(Nova::Array<Nova::TextureInfo*>& textureSet);
 
     Nova::Matrix4 lookAt(const Nova::Vector3& position, const Nova::Vector3& target, const Nova::Vector3& up = {0.0f, 1.0f, 0.0f});
     Nova::Matrix4 makePerspective(Nova::Float aspectRatio, Nova::Float fov, Nova::Float near, Nova::Float far);

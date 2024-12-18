@@ -31,12 +31,8 @@ namespace Nova
 
         struct Mesh
         {
-            Nova::Array<Vertex>  vertices;
-            Nova::Array<UInt>  indices;
-            Nova::Array<Texture*> textures;
-            Nova::UInt VAO;
-            Nova::UInt VBO;
-            Nova::UInt EBO;
+            Nova::MeshInfo meshInfo;
+            Nova::Array<Nova::TextureInfo*> textures;
         };
 
         struct Camera

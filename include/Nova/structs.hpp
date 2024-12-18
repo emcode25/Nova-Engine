@@ -8,15 +8,23 @@
 
 namespace Nova
 {
-    //Vertex is meant to be used to populate the Mesh component
-    struct Vertex
+    //VertexData is the layout of per-vertex data
+    struct VertexData
     {
         Nova::Vector3 pos;
         Nova::Vector3 normal;
         Nova::Vector2 uv;
     };
 
-    struct Texture
+    //MeshInfo contains the needed info per mesh
+    struct MeshInfo
+    {
+        Nova::UInt VAO;
+        Nova::UInt indexCount;
+        Nova::String name;
+    };
+
+    struct TextureInfo
     {
         Nova::UInt texture;
         Nova::String name;

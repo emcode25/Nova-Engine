@@ -71,8 +71,8 @@ void Nova::ObjectRenderSystem(flecs::iter& it)
             }
 
             //Render the mesh
-            glBindVertexArray(mesh.VAO);
-            glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(mesh.meshInfo.VAO);
+            glDrawElements(GL_TRIANGLES, mesh.meshInfo.indexCount, GL_UNSIGNED_INT, 0);
         }
     }
 
@@ -101,8 +101,8 @@ void Nova::ObjectRenderSystem(flecs::iter& it)
 
         //Render
         auto activeMesh = activeObj.get_ref<Nova::Component::Mesh>();
-        glBindVertexArray(activeMesh->VAO);
-        glDrawElements(GL_TRIANGLES, activeMesh->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(activeMesh->meshInfo.VAO);
+        glDrawElements(GL_TRIANGLES, activeMesh->meshInfo.indexCount, GL_UNSIGNED_INT, 0);
     }
 
     //Allow light values to change if the object is active
@@ -170,8 +170,8 @@ void Nova::PointLightRenderSystem(flecs::iter & it)
             glUniform3fv(lightColorLoc, 1, pointLight.base.diffuse.data());
 
             //Render the mesh
-            glBindVertexArray(mesh.VAO);
-            glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(mesh.meshInfo.VAO);
+            glDrawElements(GL_TRIANGLES, mesh.meshInfo.indexCount, GL_UNSIGNED_INT, 0);
         }
     }
 }

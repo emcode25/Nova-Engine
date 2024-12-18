@@ -35,6 +35,25 @@ Nova::String Nova::readFileToString(Nova::String filename)
 	return Nova::String("Could not read file.");
 }
 
+Nova::MeshInfo Nova::findMesh(const Nova::String& name, const Nova::Array<MeshInfo>& meshes)
+{
+	for (auto& mesh : meshes)
+	{
+		if (mesh.name == name)
+		{
+			return mesh;
+		}
+	}
+
+	std::cerr << "WARNING: Could not find mesh name: " << name << std::endl;
+	MeshInfo invalidMesh;
+	invalidMesh.indexCount = -1;
+	invalidMesh.name = "INVALID";
+	invalidMesh.VAO = -1;
+
+	return invalidMesh;
+}
+
 void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, Nova::Float dt)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -66,7 +85,7 @@ void Nova::processInput(GLFWwindow* window, Nova::Editor::EditorCamera& cam, Nov
 	}
 }
 
-Nova::Texture* Nova::loadTexture(Nova::String name, Nova::String filename, Nova::TexType type, Nova::Array<Nova::Texture*>& textureSet)
+Nova::TextureInfo* Nova::loadTexture(Nova::String name, Nova::String filename, Nova::TexType type, Nova::Array<Nova::TextureInfo*>& textureSet)
 {
 	for(auto texture : textureSet)
 	{
@@ -77,7 +96,7 @@ Nova::Texture* Nova::loadTexture(Nova::String name, Nova::String filename, Nova:
 		}
 	}
 
-	Nova::Texture* tex = new Nova::Texture();
+	Nova::TextureInfo* tex = new Nova::TextureInfo();
 
 	//Create the texture object
 	GLuint textureObj;
@@ -134,7 +153,7 @@ Nova::Texture* Nova::loadTexture(Nova::String name, Nova::String filename, Nova:
 	return tex;
 }
 
-void Nova::deleteTextures(Nova::Array<Nova::Texture*>& textureSet)
+void Nova::deleteTextures(Nova::Array<Nova::TextureInfo*>& textureSet)
 {
 	for (auto texture : textureSet)
 	{

@@ -194,7 +194,7 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, Nova:
         {
             if (res == NFD_OKAY)
             {
-                Nova::Texture* containerTexture = Nova::loadTexture(name, texPath, typeSelected, globalTextures);
+                Nova::TextureInfo* containerTexture = Nova::loadTexture(name, texPath, typeSelected, globalTextures);
             }
 
             texWindowOpen = false;
@@ -206,7 +206,7 @@ void Nova::EditorUI::MainMenu(GLFWwindow* window, const flecs::world& ecs, Nova:
 
 //Displays the combo tool for texture selection
 //Returns true when a selection has occurred, indexSelected will reflect what was selected
-bool textureNameCombo(int& indexSelected, Nova::Array<Nova::Texture*>& textureSet)
+bool textureNameCombo(int& indexSelected, Nova::Array<Nova::TextureInfo*>& textureSet)
 {
     if (indexSelected < 0 || indexSelected > textureSet.size())
     {
@@ -239,7 +239,7 @@ bool textureNameCombo(int& indexSelected, Nova::Array<Nova::Texture*>& textureSe
 }
 
 //Returns the index if a texture is found, -1 otherwise
-int findTextureIndex(Nova::Texture* texture, Nova::Array<Nova::Texture*>& textureSet)
+int findTextureIndex(Nova::TextureInfo* texture, Nova::Array<Nova::TextureInfo*>& textureSet)
 {
     for (int i = 0; i < textureSet.size(); ++i)
     {
@@ -284,7 +284,7 @@ void Nova::EditorUI::ShowObjectProperties(flecs::entity& obj)
 
             for (int i = 0; i < meshProps->textures.size(); ++i)
             {
-                Nova::Texture* texSelected = meshProps->textures[i];
+                Nova::TextureInfo* texSelected = meshProps->textures[i];
                 indexSelected[i] = findTextureIndex(texSelected, globalTextures);
 
                 //Recheck index for texture if a new object is found
