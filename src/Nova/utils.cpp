@@ -139,6 +139,7 @@ Nova::TextureInfo* Nova::loadTexture(Nova::String name, Nova::String filename, N
 		tex->texture = textureObj;
 		tex->type = type;
 		tex->name = name;
+		tex->path = filename;
 
 		textureSet.push_back(tex);
 	}
@@ -225,13 +226,42 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 	std::cout << "Saving scene to file: " << filepath << std::endl;
 
 	Json::Value root;
-	Json::Value data;
+
+	//Save all the meshes used
+	Json::Value meshes;
+	for (int i = 0; i < Nova::globalMeshes.size(); ++i)
+	{
+		const auto& mesh = Nova::globalMeshes[i];
+		Json::Value m;
+
+		m["name"] = mesh.name;
+		m["path"] = mesh.filepath;
+
+		meshes[std::to_string(i)] = m;
+	}
+	root["meshes"] = meshes;
+
+	//Save all the textures used
+	Json::Value textures;
+	for (int i = 0; i < Nova::globalTextures.size(); ++i)
+	{
+		const auto tex = Nova::globalTextures[i];
+		Json::Value t;
+
+		t["name"] = tex->name;
+		t["path"] = tex->path;
+		t["type"] = tex->type;
+
+		textures[std::to_string(i)] = t;
+	}
+	root["textures"] = textures;
 
 	for (const auto& e : Nova::entities)
 	{
 		Json::Value obj;
 		obj["name"] = e.doc_name();
 		
+		//Save transform info
 		if (e.has<Nova::Component::Transform>())
 		{
 			Json::Value t;
@@ -256,27 +286,24 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 			obj["transform"] = t;
 		}
 
+		//Save mesh info
 		if (e.has<Nova::Component::Mesh>())
 		{
 			Json::Value m;
-			Json::Value mi;
 			Json::Value ts;
 
 			const auto mesh = e.get<Nova::Component::Mesh>();
 			const auto meshInfo = mesh->meshInfo;
 			const auto textures = mesh->textures;
 			
-			mi["path"] = meshInfo.filepath;
-			mi["name"] = meshInfo.name;
-			m["info"] = mi;
+			//Only the name is needed for lookup later for both mesh and textures
+			m["name"] = meshInfo.name;
 
 			for (int i = 0; i < textures.size(); ++i)
 			{
 				Json::Value tex;
 
-				tex["path"] = textures[i]->path;
 				tex["name"] = textures[i]->name;
-				tex["type"] = textures[i]->type;
 
 				ts[std::to_string(i)].append(tex);
 			}
@@ -285,6 +312,41 @@ Nova::Int Nova::saveScene(const Nova::String& filepath)
 			obj["mesh"] = m;
 		}
 
+		//Save point light info
+		if (e.has<Nova::Component::PointLight>())
+		{
+			Json::Value pl;
+			Json::Value b;
+
+			const auto pointLight = e.get<Nova::Component::PointLight>();
+			const auto base = pointLight->base;
+			const auto quadratic = pointLight->quadratic;
+			const auto linear = pointLight->linear;
+			const auto constant = pointLight->constant;
+
+			//Only the name is needed for lookup later for both mesh and textures
+			b["ambient"][0] = base.ambient[0];
+			b["ambient"][1] = base.ambient[1];
+			b["ambient"][2] = base.ambient[2];
+
+			b["diffuse"][0] = base.diffuse[0];
+			b["diffuse"][1] = base.diffuse[1];
+			b["diffuse"][2] = base.diffuse[2];
+
+			b["specular"][0] = base.specular[0];
+			b["specular"][1] = base.specular[1];
+			b["specular"][2] = base.specular[2];
+
+			pl["base"] = b;
+
+			pl["quadratic"] = quadratic;
+			pl["linear"] = linear;
+			pl["constant"] = constant;
+
+			obj["point_light"] = pl;
+		}
+
+		//Use the unique ID to ensure that nothing is overwritten
 		root[std::to_string(e.id())] = obj;
 	}
 
